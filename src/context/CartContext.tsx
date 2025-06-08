@@ -18,9 +18,9 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (productId: string, quantity?: number) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>>) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>>) => Promise<void>;
   totalCount: number;
   loading: boolean;
   refetch: () => Promise<void>;
@@ -79,7 +79,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Add or update item in cart
-  const addToCart = async (productId: string, quantity = 1) => {
+  const addToCart = async (productId: string, quantity = 1, options: any = {}) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -90,7 +90,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productId, quantity }),
+        body: JSON.stringify({ productId, quantity, ...options }),
       });
       if (!res.ok) throw new Error('Failed to add to cart');
       await fetchCart();
@@ -121,8 +121,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Update quantity
-  const updateQuantity = async (productId: string, quantity: number) => {
-    await addToCart(productId, quantity);
+  const updateQuantity = async (productId: string, quantity: number, options: any = {}) => {
+    await addToCart(productId, quantity, options);
   };
 
   // Real-time polling (every 5s) and on tab focus
