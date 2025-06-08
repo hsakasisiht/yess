@@ -57,7 +57,7 @@ export default function GemsPage() {
     gem.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleAddToCart = (gem: any) => {
+  const handleAddToCart = (gem: unknown) => {
     if (!mightRange) {
       setPendingGem(gem);
     } else {

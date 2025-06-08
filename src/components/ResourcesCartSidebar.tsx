@@ -2,6 +2,7 @@
 import React from "react";
 import { useCart } from '../context/CartContext';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function ResourcesCartSidebar() {
   const { cart, updateQuantity, removeFromCart, loading } = useCart();
@@ -20,7 +21,7 @@ export default function ResourcesCartSidebar() {
         <div className="flex flex-col gap-3">
           {resources.map(item => (
             <div key={item.id} className="flex items-center gap-2 bg-[#222] rounded p-2">
-              {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-10 h-10 object-contain rounded" />}
+              {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={40} height={40} className="w-10 h-10 object-contain rounded" />}
               <div className="flex-1">
                 <div className="font-semibold text-white text-sm truncate">{item.name}</div>
                 <div className="text-blue-400 text-xs">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price).toFixed(2)}</div>

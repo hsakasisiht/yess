@@ -28,8 +28,8 @@ export default function SignupPage() {
         name: name || cred.user.displayName || undefined,
       });
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
     }
     setLoading(false);
   };
@@ -46,8 +46,8 @@ export default function SignupPage() {
         name: cred.user.displayName || undefined,
       });
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
     }
     setLoading(false);
   };

@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
+import Image from 'next/image';
 
 export default function AddGemsModal({ open, onClose, onAdd, gem }: {
   open: boolean;
   onClose: () => void;
   onAdd: (quantity: number) => void;
-  gem: any;
+  gem: unknown;
 }) {
   const [mode, setMode] = useState<"" | "stack">("");
   const [qty, setQty] = useState(1);
@@ -15,7 +16,7 @@ export default function AddGemsModal({ open, onClose, onAdd, gem }: {
       <div className="bg-[#171717] rounded-lg shadow-2xl p-6 w-full max-w-xs relative animate-fade-in-up">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl">&times;</button>
         <div className="flex flex-col items-center gap-2">
-          {gem.imageUrl && <img src={gem.imageUrl} alt={gem.name} className="w-16 h-16 object-contain" />}
+          {gem.imageUrl && <Image src={gem.imageUrl} alt={gem.name} width={64} height={64} className="w-16 h-16 object-contain" />}
           <div className="text-lg font-bold text-white text-center">{gem.name}</div>
           <div className="text-blue-400 font-semibold mb-2">{gem.gemCost} Gems</div>
           {mode === "" && (

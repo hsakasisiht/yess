@@ -2,6 +2,7 @@
 import React from "react";
 import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from "framer-motion";
+import Image from 'next/image';
 
 export default function CartPage({
   title,
@@ -32,9 +33,11 @@ export default function CartPage({
       return sum;
     }, 0);
 
-  const getGemsDollarPrice = (item: any) => {
-    if (item.category === 'GEMS' && item.pricePer100k && item.gemCost) {
-      return `$${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}`;
+  const getGemsDollarPrice = (item: unknown) => {
+    if (!item || typeof item !== 'object') return null;
+    const i = item as { gemCost?: number; pricePer100k?: number; category?: string; quantity?: number };
+    if (i.category === 'GEMS' && i.pricePer100k && i.gemCost && i.quantity) {
+      return `$${(((i.gemCost * i.quantity) / 100000) * i.pricePer100k).toFixed(2)}`;
     }
     return null;
   };
@@ -82,7 +85,7 @@ export default function CartPage({
               >
                 <div className="flex flex-row sm:flex-row w-full">
                   {item.imageUrl && (
-                    <img src={item.imageUrl} alt={item.name} className="w-14 h-14 object-contain rounded flex-shrink-0" />
+                    <Image src={item.imageUrl} alt={item.name} width={56} height={56} className="w-14 h-14 object-contain rounded flex-shrink-0" />
                   )}
                   <div className="flex flex-col justify-center flex-1 min-w-0 pl-3">
                     <div className="font-semibold text-white text-base break-words whitespace-normal">{item.name}</div>

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserIcon, HomeIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
+import Image from 'next/image';
 
 const productCategories = [
   { name: "Gems", href: "/products/gems", icon: "/gems.png" },
@@ -41,7 +42,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-4 py-2 text-white hover:bg-[#333] transition"
                   onClick={() => setProdOpen(false)}
                 >
-                  <img src={cat.icon} alt={cat.name} className="w-5 h-5" />
+                  <Image src={cat.icon} alt={cat.name} width={20} height={20} className="w-5 h-5" />
                   {cat.name}
                 </Link>
               ))}

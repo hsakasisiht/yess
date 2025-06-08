@@ -58,7 +58,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) throw new Error('Failed to fetch cart');
       const data = await res.json();
       setCart(
-        (data.items || []).map((item: any) => ({
+        (data.items || []).map((item: unknown) => ({
           id: item.productId,
           name: item.product.name,
           imageUrl: item.product.imageUrl,
@@ -79,7 +79,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Add or update item in cart
-  const addToCart = async (productId: string, quantity = 1, options: any = {}) => {
+  const addToCart = async (productId: string, quantity = 1, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = {}) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -121,7 +121,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Update quantity
-  const updateQuantity = async (productId: string, quantity: number, options: any = {}) => {
+  const updateQuantity = async (productId: string, quantity: number, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = {}) => {
     await addToCart(productId, quantity, options);
   };
 

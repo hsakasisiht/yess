@@ -7,12 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
+import Image from 'next/image';
 
 const navLinks = [
   { name: "Home", href: "/", icon: <HomeIcon className="h-5 w-5" /> },
-  { name: "Gems", href: "/products/gems", icon: <img src="/gems.png" className="h-5 w-5" alt="Gems" /> },
-  { name: "Resources", href: "/products/resources", icon: <img src="/rss.png" className="h-5 w-5" alt="Resources" /> },
-  { name: "Bots", href: "/products/bots", icon: <img src="/bot.png" className="h-5 w-5" alt="Bots" /> },
+  { name: "Gems", href: "/products/gems", icon: <Image src="/gems.png" width={20} height={20} className="h-5 w-5" alt="Gems" /> },
+  { name: "Resources", href: "/products/resources", icon: <Image src="/rss.png" width={20} height={20} className="h-5 w-5" alt="Resources" /> },
+  { name: "Bots", href: "/products/bots", icon: <Image src="/bot.png" width={20} height={20} className="h-5 w-5" alt="Bots" /> },
   { name: "Contact Us", href: "/contact", icon: null },
   { name: "Social", href: "#", icon: null },
 ];

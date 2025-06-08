@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
+import Image from 'next/image';
 
 export default function ProductModal({ open, onClose, product, size = "large" }: {
   open: boolean;
   onClose: () => void;
-  product: any;
+  product: unknown;
   size?: "small" | "large";
 }) {
   if (!open || !product) return null;
@@ -19,7 +20,7 @@ export default function ProductModal({ open, onClose, product, size = "large" }:
         style={size === "small" ? { width: '4rem', height: '4rem', minWidth: '4rem', minHeight: '4rem', maxWidth: '4rem', maxHeight: '4rem' } : {}}
       >
         <button onClick={onClose} className="absolute top-0.5 right-1 text-gray-400 hover:text-white text-xs">&times;</button>
-        {product.imageUrl && <img src={product.imageUrl} alt={product.name} className="w-6 h-6 object-contain mx-auto mb-1" />}
+        {product.imageUrl && <Image src={product.imageUrl} alt={product.name} width={24} height={24} className="w-6 h-6 object-contain mx-auto mb-1" />}
         <div className="text-blue-400 font-bold mb-0.5 text-center text-[10px]">
           {product.gemCost ? `${product.gemCost} Gems` : product.price ? `${product.price} Gems` : null}
         </div>

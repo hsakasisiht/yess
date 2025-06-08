@@ -2,11 +2,12 @@
 import { useCart } from '../../../context/CartContext';
 import CartModal from '../../../components/CartModal';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function ResourcesPage() {
   const { addToCart, cart } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
-  const [resources, setResources] = useState<any[]>([]);
+  const [resources, setResources] = useState<unknown[]>([]);
   const totalResources = cart.filter(i => i.category === 'RESOURCES').reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function ResourcesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {resources.map((res) => (
               <div key={res.id} className="bg-[#171717] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4 hover:bg-[#222] transition-transform hover:scale-105">
-                <img src="/rss.png" alt="Resource" className="w-20 h-20 object-contain" />
+                <Image src="/rss.png" alt="Resource" width={80} height={80} className="w-20 h-20 object-contain" />
                 <div className="text-xl font-semibold">{res.name}</div>
                 <div className="text-blue-400 font-bold">{res.resourceAmount || res.resourceType}</div>
                 <div className="text-gray-400 text-sm text-center">{res.description}</div>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const categories = [
   { name: 'Gems', href: '/products/gems', icon: '/gem.svg' },
@@ -13,7 +14,7 @@ export default function ProductsPage() {
       <div className="flex flex-wrap gap-8 justify-center">
         {categories.map((cat) => (
           <Link key={cat.name} href={cat.href} className="bg-[#171717] rounded-lg shadow-lg p-8 flex flex-col items-center gap-4 hover:bg-[#222] transition-transform hover:scale-105">
-            <img src={cat.icon} alt={cat.name} className="w-16 h-16" />
+            <Image src={cat.icon} alt={cat.name} width={64} height={64} className="w-16 h-16" />
             <span className="text-xl font-semibold">{cat.name}</span>
           </Link>
         ))}

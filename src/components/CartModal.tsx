@@ -2,14 +2,16 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useCart } from '../context/CartContext';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
-// Helper to safely convert Decimal or other values to number
-const getNumber = (val: any) => {
-  if (val && typeof val === 'object' && typeof val.toNumber === 'function') {
-    return val.toNumber();
+function getNumber(val: unknown): number {
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') return Number(val) || 0;
+  if (val && typeof val === 'object' && 'toNumber' in val && typeof (val as any).toNumber === 'function') {
+    return (val as { toNumber: () => number }).toNumber();
   }
-  return Number(val) || 0;
-};
+  return 0;
+}
 
 export default function CartModal({ open, onClose, category }: { open: boolean; onClose: () => void; category?: string }) {
   const { cart, updateQuantity, removeFromCart, loading } = useCart();
@@ -43,11 +45,13 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
       return sum;
     }, 0);
 
-  const getGemsDollarPrice = (item: any) => {
-    const gemCost = getNumber(item.gemCost);
-    const pricePer100k = getNumber(item.pricePer100k);
-    if (item.category === 'GEMS' && pricePer100k && gemCost && item.quantity) {
-      return `$${(((gemCost * item.quantity) / 100000) * pricePer100k).toFixed(2)}`;
+  const getGemsDollarPrice = (item: unknown) => {
+    if (!item || typeof item !== 'object') return null;
+    const i = item as { gemCost?: unknown; pricePer100k?: unknown; category?: string; quantity?: number };
+    const gemCost = getNumber(i.gemCost);
+    const pricePer100k = getNumber(i.pricePer100k);
+    if (i.category === 'GEMS' && pricePer100k && gemCost && i.quantity) {
+      return `$${(((gemCost * i.quantity) / 100000) * pricePer100k).toFixed(2)}`;
     }
     return null;
   };
@@ -83,7 +87,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                 >
                   <div className="flex flex-row sm:flex-row w-full">
                     {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.name} className="w-14 h-14 object-contain rounded flex-shrink-0" />
+                      <Image src={item.imageUrl} alt={item.name} width={56} height={56} className="w-14 h-14 object-contain rounded flex-shrink-0" />
                     )}
                     <div className="flex flex-col justify-center flex-1 min-w-0 pl-3">
                       <div className="font-semibold text-white text-base break-words whitespace-normal">{item.name}</div>
@@ -148,7 +152,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                 >
                   <div className="flex flex-row sm:flex-row w-full">
                     {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.name} className="w-14 h-14 object-contain rounded flex-shrink-0" />
+                      <Image src={item.imageUrl} alt={item.name} width={56} height={56} className="w-14 h-14 object-contain rounded flex-shrink-0" />
                     )}
                     <div className="flex flex-col justify-center flex-1 min-w-0 pl-3">
                       <div className="font-semibold text-white text-base break-words whitespace-normal">{item.name}</div>
