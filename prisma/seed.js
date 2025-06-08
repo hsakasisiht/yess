@@ -6,7 +6,7 @@ async function main() {
   await prisma.cartItem.deleteMany();
   // Delete existing products to avoid duplicates
   await prisma.product.deleteMany();
-
+//
   // All Gems/Materials from Lords Mobile gems mall
   await prisma.product.createMany({
     data: [
