@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import prismaModule from '../../../src/generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { verifyIdToken } from '../../../src/lib/firebaseAdmin';
 
-const prisma = new prismaModule.PrismaClient();
+const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'DELETE') {
