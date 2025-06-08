@@ -1,0 +1,12 @@
+"use client";
+import ProtectedRoute from '../../components/ProtectedRoute';
+
+export default function AdminPage() {
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white">
+        <h1 className="text-3xl font-bold">Admin Panel (Protected)</h1>
+      </div>
+    </ProtectedRoute>
+  );
+} 

@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  firebaseUid String @unique
+  name      String
+  role      String   @default("user") // user or admin
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  imageUrl    String?
+  category    ProductCategory
+  price       Decimal  @db.Decimal(10,2) // price in gems or currency units
+  gemCost     Int?     // for gems category
+  resourceType String? // for resources category (food, stone, wood, ore, gold)
+  resourceAmount Int?  // for resources category
+  botType     String?  // for bots category
+  orders      OrderItem[]
+  cartItems   CartItem[]
+  createdAt   DateTime @default(now())
+}
+
+enum ProductCategory {
+  GEMS
+  RESOURCES
+  BOTS
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+  items     OrderItem[]
+  total     Int
+  status    String      @default("pending")
+  createdAt DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int      @default(1)
+}
+
+model Cart {
+  id        String      @id @default(uuid())
+  userEmail String      @unique // User's email (unique per user)
+  items     CartItem[]
+  updatedAt DateTime    @updatedAt
+}
+
+model CartItem {
+  id              String   @id @default(uuid())
+  cart            Cart     @relation(fields: [cartId], references: [id])
+  cartId          String
+  product         Product  @relation(fields: [productId], references: [id])
+  productId       String
+  quantity        Int      @default(1)
+  mightRange      String?  // e.g. "400-799"
+  mightRangeLabel String?  // e.g. "400m - 799m"
+  pricePer100k    Float?   // e.g. 4.45
+  gemCost         Int?     // number of gems for this item
+}
