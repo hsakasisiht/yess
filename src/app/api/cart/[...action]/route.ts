@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import prismaModule from '../../../../generated/prisma';
 import { verifyIdToken } from '../../../../lib/firebaseAdmin';
 import type { NextRequest as NextRequestType } from 'next/server';

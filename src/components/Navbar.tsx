@@ -15,7 +15,6 @@ const productCategories = [
 
 export default function Navbar() {
   const { user } = useAuth();
-  const [open, setOpen] = useState(false);
   const [prodOpen, setProdOpen] = useState(false);
 
   return (

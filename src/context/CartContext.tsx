@@ -71,7 +71,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           mightRangeLabel: item.mightRangeLabel,
         }))
       );
-    } catch (e) {
+    } catch {
       setCart([]);
     } finally {
       setLoading(false);
