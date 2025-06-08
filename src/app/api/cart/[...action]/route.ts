@@ -5,7 +5,12 @@ import type { NextRequest as NextRequestType } from 'next/server';
 
 const prisma = new prismaModule.PrismaClient();
 
-export async function GET(req: NextRequestType) {
+export async function GET(req: NextRequestType, { params }: { params: { action: string[] } }) {
+  // Only proceed if the action is 'get'
+  if (params.action[0] !== 'get') {
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  }
+  
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,7 +35,12 @@ export async function GET(req: NextRequestType) {
   return NextResponse.json(cart);
 }
 
-export async function POST(req: NextRequestType) {
+export async function POST(req: NextRequestType, { params }: { params: { action: string[] } }) {
+  // Only proceed if the action is 'add'
+  if (params.action[0] !== 'add') {
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  }
+  
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -90,7 +100,12 @@ export async function POST(req: NextRequestType) {
   return NextResponse.json(updatedCart);
 }
 
-export async function DELETE(req: NextRequestType) {
+export async function DELETE(req: NextRequestType, { params }: { params: { action: string[] } }) {
+  // Only proceed if the action is 'remove'
+  if (params.action[0] !== 'remove') {
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  }
+  
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -104,8 +119,8 @@ export async function DELETE(req: NextRequestType) {
   let body;
   try {
     body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid JSON', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
   }
   const { productId } = body;
   if (!productId) {
@@ -124,4 +139,10 @@ export async function DELETE(req: NextRequestType) {
     include: { items: { include: { product: true } } },
   });
   return NextResponse.json(updatedCart);
-} 
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}; 
