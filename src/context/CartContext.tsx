@@ -79,7 +79,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Add or update item in cart
-  const addToCart = async (productId: string, quantity = 1, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = {}) => {
+  const addToCart = async (productId: string, quantity = 1, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = undefined) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -121,7 +121,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Update quantity
-  const updateQuantity = async (productId: string, quantity: number, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = {}) => {
+  const updateQuantity = async (productId: string, quantity: number, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = undefined) => {
     await addToCart(productId, quantity, options);
   };
 

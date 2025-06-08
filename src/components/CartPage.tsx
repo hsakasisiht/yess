@@ -19,7 +19,6 @@ export default function CartPage({
   const items = filterCategory ? cart.filter(i => i.category === filterCategory) : cart;
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const totalGems = items.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0);
-  const isGemsCart = filterCategory === 'GEMS';
   const isCheckout = showSummary;
   const gemsBelowMin = isCheckout && totalGems > 0 && totalGems < 100000;
 

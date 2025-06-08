@@ -14,15 +14,6 @@ interface MightRange {
   price: number;
 }
 
-// Define the might ranges and their prices
-const MIGHT_RANGES = [
-  { key: '0-399', label: '0-399m', price: 4.35 },
-  { key: '400-799', label: '400m - 799m', price: 4.45 },
-  { key: '800-1099', label: '800m - 1099m', price: 4.6 },
-  { key: '1100-1499', label: '1100m - 1499m', price: 4.8 },
-  { key: '1500-2399', label: '1500m - 2399m', price: 4.9 },
-];
-
 export default function GemsPage() {
   const [gems, setGems] = useState<Array<{
     id: string;

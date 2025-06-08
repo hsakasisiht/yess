@@ -7,7 +7,7 @@ import Image from 'next/image';
 function getNumber(val: unknown): number {
   if (typeof val === 'number') return val;
   if (typeof val === 'string') return Number(val) || 0;
-  if (val && typeof val === 'object' && 'toNumber' in val && typeof (val as any).toNumber === 'function') {
+  if (val && typeof val === 'object' && 'toNumber' in val && typeof (val as { toNumber: unknown }).toNumber === 'function') {
     return (val as { toNumber: () => number }).toNumber();
   }
   return 0;
