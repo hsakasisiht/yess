@@ -58,21 +58,22 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (!res.ok) throw new Error('Failed to fetch cart');
       const data = await res.json();
       setCart(
-        (data.items || []).map((item: unknown) => ({
+        (data.items || []).map((item: any) => ({
           id: item.productId,
-          name: item.product.name,
-          imageUrl: item.product.imageUrl,
-          price: item.product.price,
-          gemCost: item.gemCost,
+          name: item.product?.name ?? '',
+          imageUrl: item.product?.imageUrl ?? '',
+          price: item.product?.price ?? 0,
+          gemCost: item.gemCost ?? 0,
           quantity: item.quantity,
-          category: item.product.category,
+          category: item.product?.category ?? '',
           mightRange: item.mightRange,
           pricePer100k: item.pricePer100k,
           mightRangeLabel: item.mightRangeLabel,
         }))
       );
-    } catch {
-      setCart([]);
+    } catch (err) {
+      // Only log the error, don't clear the cart
+      console.error('Failed to fetch cart:', err);
     } finally {
       setLoading(false);
     }
@@ -129,14 +130,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!user) return;
     fetchCart();
-    const interval = setInterval(fetchCart, 5000);
-    const onFocus = () => fetchCart();
-    window.addEventListener('focus', onFocus);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
-    };
-    // eslint-disable-next-line
   }, [user]);
 
   const totalCount = cart.reduce((sum, i) => sum + i.quantity, 0);
