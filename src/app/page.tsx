@@ -39,11 +39,6 @@ export default function Home() {
         <Link href="/products" className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105 animate-bounce">
           Shop Now
         </Link>
-        {user && (
-          <button onClick={printToken} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Print Firebase Token
-          </button>
-        )}
       </section>
       <section className="w-full max-w-5xl flex flex-col items-center gap-8 py-12">
         <h2 className="text-3xl font-bold mb-4">Featured Categories</h2>
