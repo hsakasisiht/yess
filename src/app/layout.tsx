@@ -29,8 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen overflow-x-hidden`}
       >
+        {/* Global background gradient and glow */}
+        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a]" />
+        <div className="fixed left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-gradient-radial from-blue-700/40 via-purple-600/30 to-transparent rounded-full blur-3xl opacity-70 -z-10" />
         <AuthProvider>
           <CartProvider>
             <div className="hidden sm:block"><Navbar /></div>

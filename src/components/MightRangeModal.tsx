@@ -23,15 +23,15 @@ const MIGHT_RANGES: MightRange[] = [
 export default function MightRangeModal({ open, onClose, onSelect }: MightRangeModalProps) {
   if (!open) return null;
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div style={{ background: '#222', color: '#fff', padding: 32, borderRadius: 8, minWidth: 320, maxWidth: 400 }}>
-        <h2 style={{ fontSize: 22, marginBottom: 16 }}>Select Might Range</h2>
-        <ul style={{ listStyle: 'none', padding: 0, marginBottom: 24 }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
+      <div className="bg-black/70 text-white p-8 rounded-xl min-w-[320px] max-w-[400px] w-full backdrop-blur-xl">
+        <h2 className="text-2xl mb-4 font-bold">Select Might Range</h2>
+        <ul className="list-none p-0 mb-6">
           {MIGHT_RANGES.map(range => (
-            <li key={range.key} style={{ marginBottom: 10 }}>
+            <li key={range.key} className="mb-2">
               <button
                 onClick={() => onSelect(range)}
-                style={{ width: '100%', padding: '10px 0', background: '#333', color: '#fff', border: 'none', borderRadius: 4, fontWeight: 500, cursor: 'pointer', fontSize: 16 }}
+                className="w-full py-2 bg-white/10 hover:bg-white/30 text-white font-bold rounded font-medium text-base transition"
               >
                 {range.label}
               </button>
@@ -40,7 +40,7 @@ export default function MightRangeModal({ open, onClose, onSelect }: MightRangeM
         </ul>
         <button
           onClick={onClose}
-          style={{ padding: '8px 20px', background: '#444', color: '#fff', border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}
+          className="px-5 py-2 bg-black/30 hover:bg-black/50 text-white rounded font-semibold transition"
         >
           Cancel
         </button>

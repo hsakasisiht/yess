@@ -6,7 +6,7 @@ import '../../../../lib/firebaseAdmin';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('session')?.value;
@@ -14,12 +14,13 @@ export async function GET(req: NextRequest) {
     const decoded = await getAuth().verifySessionCookie(sessionCookie, true);
     if (!decoded || !decoded.uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } });
-    if (!user || user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const orders = await prisma.order.findMany({
-      include: { user: true, items: { include: { product: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json({ orders });
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const { productId } = await req.json();
+    if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
+    const cart = await prisma.cart.findUnique({ where: { userEmail: user.email } });
+    if (!cart) return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id, productId } });
+    return NextResponse.json({ status: 'success' });
   } catch (error) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

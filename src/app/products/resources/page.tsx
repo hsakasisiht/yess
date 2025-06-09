@@ -20,18 +20,22 @@ export default function ResourcesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-8 animate-fade-in mt-16 sm:mt-0">
+    <div className="min-h-screen text-white p-8 animate-fade-in mt-16 sm:mt-0">
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex items-center justify-between mb-8 gap-4">
         <h1 className="text-3xl font-bold">Resources</h1>
-        <div className="flex items-center">
+        <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
           <div
-            className="bg-[#222] rounded-full px-5 py-2 text-white font-bold text-lg flex items-center gap-2 shadow cursor-pointer hover:bg-[#333] transition"
+            className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-green-500/30 shadow-lg hover:shadow-green-500/30 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:bg-white/20"
             onClick={() => setCartOpen(true)}
             title="View Cart"
+            style={{ minWidth: 120 }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-400"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25A3.75 3.75 0 0011.25 18h1.5a3.75 3.75 0 003.75-3.75m-9-9h12.216c.977 0 1.651.97 1.337 1.91l-1.43 4.287a2.25 2.25 0 01-2.143 1.553H6.684m10.566 0l-.348 1.045c-.285.855-1.085 1.455-1.987 1.455H8.25m-2.25-6.75l1.5 6.75m0 0l.75 3.375m0 0h6m-6 0a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75z" /></svg>
-            ${totalResources.toFixed(2)}
+            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-green-500/20 border border-green-400/30 shadow-inner">
+              <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 12.93V17h-2v-2.07A6.002 6.002 0 014 11H2v-2h2a6.002 6.002 0 015-5.93V3h2v2.07A6.002 6.002 0 0116 9h2v2h-2a6.002 6.002 0 01-5 5.93z"/></svg>
+            </span>
+            <span className="font-bold text-base text-green-100 drop-shadow">Resources Cart</span>
+            <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">${totalResources.toFixed(0)}</span>
           </div>
         </div>
       </div>
@@ -39,7 +43,7 @@ export default function ResourcesPage() {
         <div className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {resources.map((res) => (
-              <div key={res.id} className="bg-[#171717] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4 hover:bg-[#222] transition-transform hover:scale-105">
+              <div key={res.id} className="bg-black/40 rounded-lg shadow-lg p-6 flex flex-col items-center gap-4 hover:bg-black/60 transition-transform hover:scale-105 backdrop-blur-md text-white">
                 <Image src="/rss.png" alt="Resource" width={80} height={80} className="w-20 h-20 object-contain" />
                 <div className="text-xl font-semibold">{res.name}</div>
                 <div className="text-blue-400 font-bold">{res.resourceAmount || res.resourceType}</div>

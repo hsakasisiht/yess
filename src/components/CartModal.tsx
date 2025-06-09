@@ -58,8 +58,8 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 animate-fade-in">
-      <div className="bg-[#171717] border border-[#333] rounded-xl shadow-2xl shadow-blue-900/40 p-6 w-full max-w-lg sm:max-w-md max-h-[90vh] relative animate-fade-in-up flex flex-col overflow-x-hidden transition-all duration-300 scale-95 opacity-0 animate-cart-modal-in" style={{ minHeight: 400, scrollbarColor: 'transparent transparent', scrollbarWidth: 'thin' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
+      <div className="bg-black/70 border border-blue-900/40 backdrop-blur-xl rounded-xl shadow-2xl p-6 w-full max-w-lg sm:max-w-md max-h-[90vh] relative animate-fade-in-up flex flex-col overflow-x-hidden transition-all duration-300 scale-95 opacity-0 animate-cart-modal-in" style={{ minHeight: 400, scrollbarColor: 'transparent transparent', scrollbarWidth: 'thin' }}>
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl">&times;</button>
         <h2 className="text-2xl font-bold mb-4 text-white">Your Cart</h2>
         {/* Optionally show which cart this is */}
@@ -78,11 +78,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
               item.category === 'GEMS' ? (
                 <div
                   key={item.id}
-                  className={
-                    item.category === 'GEMS' || item.category === 'RESOURCES'
-                      ? "bg-[#2c2c2c] rounded-lg shadow-lg p-4 hover:bg-[#23272f] transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500"
-                      : "flex items-center gap-3 bg-[#222] rounded p-2 min-w-0"
-                  }
+                  className="bg-white/10 rounded-lg shadow-lg p-4 hover:bg-white/20 transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500 backdrop-blur-md text-white"
                   style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.25)' }}
                 >
                   <div className="flex flex-row sm:flex-row w-full">
@@ -143,11 +139,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
               ) : (
                 <div
                   key={item.id}
-                  className={
-                    item.category === 'GEMS' || item.category === 'RESOURCES'
-                      ? "bg-[#2c2c2c] rounded-lg shadow-lg p-4 hover:bg-[#23272f] transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500"
-                      : "flex items-center gap-3 bg-[#222] rounded p-2 min-w-0"
-                  }
+                  className="bg-white/10 rounded-lg shadow-lg p-4 hover:bg-white/20 transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500 backdrop-blur-md text-white"
                   style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.25)' }}
                 >
                   <div className="flex flex-row sm:flex-row w-full">

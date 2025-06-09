@@ -12,8 +12,8 @@ export default function AddGemsModal({ open, onClose, onAdd, gem }: {
   const [qty, setQty] = useState(1);
   if (!open || !gem) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 animate-fade-in">
-      <div className="bg-[#171717] rounded-lg shadow-2xl p-6 w-full max-w-xs relative animate-fade-in-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
+      <div className="bg-black/70 rounded-lg shadow-2xl p-6 w-full max-w-xs relative animate-fade-in-up backdrop-blur-xl">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl">&times;</button>
         <div className="flex flex-col items-center gap-2">
           {gem.imageUrl && <Image src={gem.imageUrl} alt={gem.name} width={64} height={64} className="w-16 h-16 object-contain" />}

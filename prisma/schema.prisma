@@ -46,13 +46,14 @@ enum ProductCategory {
 }
 
 model Order {
-  id        String      @id @default(uuid())
-  user      User        @relation(fields: [userId], references: [id])
-  userId    String
-  items     OrderItem[]
-  total     Int
-  status    String      @default("pending")
-  createdAt DateTime    @default(now())
+  id            String      @id @default(uuid())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
+  items         OrderItem[]
+  total         Int
+  status        String      @default("pending") // Order status: pending, processing, done, etc.
+  paymentStatus String      @default("pending") // Payment status: pending, paid, failed, etc.
+  createdAt     DateTime    @default(now())
 }
 
 model OrderItem {
@@ -62,6 +63,8 @@ model OrderItem {
   product   Product  @relation(fields: [productId], references: [id])
   productId String
   quantity  Int      @default(1)
+  gemCost   Int?
+  pricePer100k Float?
 }
 
 model Cart {

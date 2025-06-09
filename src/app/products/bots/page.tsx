@@ -11,11 +11,11 @@ async function getBots() {
 export default async function BotsPage() {
   const bots = await getBots();
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-8 animate-fade-in">
+    <div className="min-h-screen text-white p-8 animate-fade-in">
       <h1 className="text-3xl font-bold mb-8">Bots</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {bots.map((bot) => (
-          <div key={bot.id} className="bg-[#171717] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4 hover:bg-[#222] transition-transform hover:scale-105">
+          <div key={bot.id} className="bg-black/30 rounded-lg shadow-lg p-6 flex flex-col items-center gap-4 hover:bg-black/60 transition-transform hover:scale-105 backdrop-blur-md text-white">
             {bot.imageUrl && <Image src={bot.imageUrl} alt={bot.name} width={80} height={80} className="w-20 h-20 object-contain" />}
             <div className="text-xl font-semibold">{bot.name}</div>
             <div className="text-blue-400 font-bold">{bot.price.toString()} Gems</div>

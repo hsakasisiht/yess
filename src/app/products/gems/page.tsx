@@ -81,46 +81,107 @@ export default function GemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8 animate-fade-in">
+    <div className="min-h-screen text-white p-4 sm:p-8 animate-fade-in">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 w-full">
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <h1 className="text-3xl font-bold text-left">Gems</h1>
-        </div>
-        {mightRange && (
-          <div className="flex items-center">
-            <button
-              className="ml-2 px-3 py-1 rounded bg-[#222] text-blue-400 font-mono text-base border border-blue-700 hover:bg-[#333] transition"
-              onClick={() => setResetModalOpen(true)}
-              title="Change Might Range"
+      {/* Responsive Top Bar */}
+      <div className="w-full mb-8">
+        {/* Desktop layout */}
+        <div className="hidden md:flex flex-row items-center justify-between gap-4 w-full">
+          {/* Left: Gems title + Might Range */}
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-left">Gems</h1>
+            {mightRange && (
+              <button
+                className="px-4 py-2 rounded bg-[#222] text-blue-400 font-mono text-base border border-blue-700 hover:bg-[#333] transition"
+                onClick={() => setResetModalOpen(true)}
+                title="Change Might Range"
+              >
+                {mightRange.label}
+              </button>
+            )}
+          </div>
+          {/* Center: Gems Cart */}
+          <div className="flex-1 flex justify-center items-center">
+            <div
+              className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-blue-500/30 shadow-lg hover:shadow-blue-500/30 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:bg-white/20"
+              onClick={() => setCartOpen(true)}
+              title="View Cart"
+              style={{ minWidth: 120 }}
             >
-              {mightRange.label}
-            </button>
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 shadow-inner">
+                <svg className="w-5 h-5 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+              </span>
+              <span className="font-bold text-base text-blue-100 drop-shadow">Gems Cart</span>
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">{totalGems}</span>
+            </div>
           </div>
-        )}
-        <div className="flex-1 flex justify-center items-center w-full sm:w-auto">
-          <div
-            className="bg-[#222] rounded-full px-5 py-2 text-white font-bold text-lg flex items-center gap-2 shadow cursor-pointer hover:bg-[#333] transition"
-            onClick={() => setCartOpen(true)}
-            title="View Cart"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-400"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25A3.75 3.75 0 0011.25 18h1.5a3.75 3.75 0 003.75-3.75m-9-9h12.216c.977 0 1.651.97 1.337 1.91l-1.43 4.287a2.25 2.25 0 01-2.143 1.553H6.684m10.566 0l-.348 1.045c-.285.855-1.085 1.455-1.987 1.455H8.25m-2.25-6.75l1.5 6.75m0 0l.75 3.375m0 0h6m-6 0a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75z" /></svg>
-            {totalGems} Gems
+          {/* Right: Search bar */}
+          <div className="relative w-full max-w-xs">
+            <input
+              type="text"
+              placeholder="Search gems..."
+              className="w-full p-3 rounded-lg bg-white/10 backdrop-blur-md border border-blue-500/30 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40 shadow transition-all pl-10 relative"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ position: 'relative' }}
+            />
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+            </span>
           </div>
         </div>
-        <input
-          type="text"
-          placeholder="Search gems..."
-          className="w-full sm:w-72 p-3 rounded bg-[#171717] text-white border border-[#333] focus:outline-none focus:border-blue-500"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        {/* Mobile/Tablet layout (unchanged) */}
+        <div className="flex flex-col gap-4 w-full md:hidden mt-15">
+          <div className="flex flex-row items-center justify-between gap-4 w-full mt-4 md:mt-0">
+            {/* Might Range Selector (left) */}
+            <div className="flex items-center">
+              {mightRange && (
+                <button
+                  className="px-4 py-2 rounded bg-[#222] text-blue-400 font-mono text-base border border-blue-700 hover:bg-[#333] transition"
+                  onClick={() => setResetModalOpen(true)}
+                  title="Change Might Range"
+                >
+                  {mightRange.label}
+                </button>
+              )}
+            </div>
+            {/* Gems Cart Button (right) */}
+            <div className="flex-1 flex justify-end items-center">
+              <div
+                className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-blue-500/30 shadow-lg hover:shadow-blue-500/30 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:bg-white/20"
+                onClick={() => setCartOpen(true)}
+                title="View Cart"
+                style={{ minWidth: 120 }}
+              >
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 shadow-inner">
+                  <svg className="w-5 h-5 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+                </span>
+                <span className="font-bold text-base text-blue-100 drop-shadow">Gems Cart</span>
+                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">{totalGems}</span>
+              </div>
+            </div>
+          </div>
+          {/* Search Bar */}
+          <div className="relative w-full mt-2">
+            <input
+              type="text"
+              placeholder="Search gems..."
+              className="w-full sm:w-72 p-3 rounded-lg bg-white/10 backdrop-blur-md border border-blue-500/30 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40 shadow transition-all pl-10 relative"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ position: 'relative' }}
+            />
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+            </span>
+          </div>
+        </div>
       </div>
       <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-10 gap-4 lg:gap-6 xl:gap-8">
         {filteredGems.map((gem) => (
           <div
             key={gem.id}
-            className="bg-[#171717] rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 gap-2 hover:bg-[#222] transition-transform hover:scale-105"
+            className="bg-black/40 rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 gap-2 hover:bg-black/60 transition-transform hover:scale-105 backdrop-blur-md text-white"
           >
             {gem.imageUrl && (
               <Image

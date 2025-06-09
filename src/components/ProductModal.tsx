@@ -11,9 +11,9 @@ export default function ProductModal({ open, onClose, product, size = "large" }:
   if (!open || !product) return null;
   const imageStyle = size === "small" ? { maxWidth: '4rem', maxHeight: '4rem' } : undefined;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
       <div
-        className={`bg-[#171717] rounded-lg shadow-2xl relative animate-fade-in-up flex flex-col items-center justify-center
+        className={`bg-black/70 rounded-lg shadow-2xl relative animate-fade-in-up flex flex-col items-center justify-center backdrop-blur-xl
           ${size === "small"
             ? "w-16 h-16 p-1"
             : "max-w-md w-full p-8"}

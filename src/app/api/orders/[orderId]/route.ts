@@ -6,7 +6,7 @@ import '../../../../lib/firebaseAdmin';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { orderId: string } }) {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('session')?.value;
@@ -14,12 +14,13 @@ export async function GET(req: NextRequest) {
     const decoded = await getAuth().verifySessionCookie(sessionCookie, true);
     if (!decoded || !decoded.uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } });
-    if (!user || user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const orders = await prisma.order.findMany({
-      include: { user: true, items: { include: { product: true } } },
-      orderBy: { createdAt: 'desc' },
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const order = await prisma.order.findUnique({
+      where: { id: params.orderId },
+      include: { items: { include: { product: true } } },
     });
-    return NextResponse.json({ orders });
+    if (!order || order.userId !== user.id) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    return NextResponse.json({ order });
   } catch (error) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
