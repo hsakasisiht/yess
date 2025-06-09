@@ -6,6 +6,8 @@ import MightRangeModal from '../../../components/MightRangeModal';
 import AddGemsModal from '../../../components/AddGemsModal';
 import ResetMightModal from '../../../components/ResetMightModal';
 import Image from 'next/image';
+import { useAuth } from '../../../context/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
 // Type for mightRange
 interface MightRange {
@@ -30,6 +32,7 @@ export default function GemsPage() {
   const [addModalGem, setAddModalGem] = useState<{ id: string; name: string; imageUrl?: string; gemCost: number } | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [resetModalOpen, setResetModalOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch('/api/products/gems')
@@ -49,6 +52,10 @@ export default function GemsPage() {
   );
 
   const handleAddToCart = (gem: unknown) => {
+    if (!user) {
+      toast.error('You must be logged in to add items to the cart.');
+      return;
+    }
     if (!mightRange) {
       setPendingGem(gem);
     } else {
@@ -59,7 +66,10 @@ export default function GemsPage() {
 
   const handleAddGems = (quantity: number) => {
     if (!addModalGem || !mightRange) return;
-    // Pass mightRange, price per 100k, and gemCost to addToCart
+    if (!user) {
+      toast.error('You must be logged in to add items to the cart.');
+      return;
+    }
     addToCart(addModalGem.id, quantity, {
       mightRange: mightRange.key,
       mightRangeLabel: mightRange.label,
@@ -72,6 +82,7 @@ export default function GemsPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-4 sm:p-8 animate-fade-in">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4 w-full">
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <h1 className="text-3xl font-bold text-left">Gems</h1>

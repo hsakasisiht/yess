@@ -3,9 +3,12 @@ import { useCart } from '../../../context/CartContext';
 import CartModal from '../../../components/CartModal';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useAuth } from '../../../context/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function ResourcesPage() {
   const { addToCart, cart } = useCart();
+  const { user } = useAuth();
   const [cartOpen, setCartOpen] = useState(false);
   const [resources, setResources] = useState<unknown[]>([]);
   const totalResources = cart.filter(i => i.category === 'RESOURCES').reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -18,6 +21,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-8 animate-fade-in mt-16 sm:mt-0">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="flex items-center justify-between mb-8 gap-4">
         <h1 className="text-3xl font-bold">Resources</h1>
         <div className="flex items-center">
@@ -43,7 +47,13 @@ export default function ResourcesPage() {
                 <div className="text-green-400 font-bold text-lg">${typeof res.price === 'number' ? res.price.toFixed(2) : parseFloat(res.price).toFixed(2)}</div>
                 <button
                   className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-                  onClick={() => addToCart(res.id, 1)}
+                  onClick={() => {
+                    if (!user) {
+                      toast.error('You must be logged in to add items to the cart.');
+                      return;
+                    }
+                    addToCart(res.id, 1);
+                  }}
                 >
                   Add to Cart
                 </button>
