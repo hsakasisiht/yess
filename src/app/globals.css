@@ -32,3 +32,13 @@ body {
 .animate-fade-in-up {
   animation: fade-in-up 0.25s cubic-bezier(0.4,0,0.2,1) both;
 }
+
+/* Hide number input arrows for all browsers */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner[type="number"] {
+  -moz-appearance: textfield;
+}

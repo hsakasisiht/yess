@@ -14,7 +14,7 @@ function getNumber(val: unknown): number {
 }
 
 export default function CartModal({ open, onClose, category }: { open: boolean; onClose: () => void; category?: string }) {
-  const { cart, updateQuantity, removeFromCart, loading } = useCart();
+  const { cart, updateQuantity, removeFromCart, loading, refetch } = useCart();
   console.log('CartModal cart:', cart);
   const items = category ? cart.filter(i => i.category === category) : cart;
   const total = items.reduce((sum, item) => sum + ((getNumber(item.gemCost) || getNumber(item.price)) * item.quantity), 0);
@@ -32,6 +32,15 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
     node.addEventListener('scroll', handleScroll);
     return () => node.removeEventListener('scroll', handleScroll);
   }, [open]);
+
+  // Only call refetch when modal transitions from closed to open
+  const prevOpen = useRef(open);
+  useEffect(() => {
+    if (open && !prevOpen.current) {
+      refetch();
+    }
+    prevOpen.current = open;
+  }, [open, refetch]);
 
   // Calculate total for gems using pricePer100k
   const gemsTotal = items
@@ -58,8 +67,8 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
-      <div className="bg-black/70 border border-blue-900/40 backdrop-blur-xl rounded-xl shadow-2xl p-6 w-full max-w-lg sm:max-w-md max-h-[90vh] relative animate-fade-in-up flex flex-col overflow-x-hidden transition-all duration-300 scale-95 opacity-0 animate-cart-modal-in" style={{ minHeight: 400, scrollbarColor: 'transparent transparent', scrollbarWidth: 'thin' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+      <div className="bg-black/70 border border-blue-900/40 backdrop-blur-xl rounded-xl shadow-2xl p-6 w-full max-w-lg sm:max-w-md max-h-[90vh] relative">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-white text-2xl">&times;</button>
         <h2 className="text-2xl font-bold mb-4 text-white">Your Cart</h2>
         {/* Optionally show which cart this is */}
@@ -68,12 +77,11 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
         {category === 'GEMS' && items.length > 0 && showScrollLine && (
           <div className="w-full h-1 mb-2 rounded-full bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 opacity-80 shadow-lg animate-pulse transition-opacity duration-500" />
         )}
-        {loading ? (
-          <div className="flex justify-center items-center py-8"><span className="loader" /></div>
-        ) : items.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-gray-400 text-center">Your cart is empty.</div>
         ) : (
-          <div ref={scrollRef} className="flex flex-col gap-4 flex-1">
+          <div ref={scrollRef} className="flex flex-col gap-4 flex-1 relative">
+            {loading && <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10"><span className="loader" /></div>}
             {items.map(item => (
               item.category === 'GEMS' ? (
                 <div
@@ -202,7 +210,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
           </div>
         )}
         {/* Total and button always at the bottom */}
-        {items.length > 0 && !loading && (
+        {items.length > 0 && (
           <div className="mt-4">
             <div className="text-right text-lg font-bold text-blue-400 mb-2">
               Total: {category === 'GEMS' || items.some(i => i.category === 'GEMS')
@@ -214,20 +222,11 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
               onClick={() => router.push('/cart/checkout')}
               disabled={loading}
             >
-              Proceed to Checkout
+              {loading ? "Loading..." : "Proceed to Checkout"}
             </button>
           </div>
         )}
       </div>
-      <style jsx global>{`
-      @keyframes cart-modal-in {
-        0% { opacity: 0; transform: scale(0.95); }
-        100% { opacity: 1; transform: scale(1); }
-      }
-      .animate-cart-modal-in {
-        animation: cart-modal-in 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
-      }
-      `}</style>
     </div>
   );
 } 

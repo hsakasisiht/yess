@@ -11,7 +11,7 @@ export default function ResourcesCartSidebar() {
   const subtotal = resources.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   return (
-    <aside className="bg-[#171717] rounded-lg shadow-xl p-4 w-full max-w-xs sticky top-6 self-start flex flex-col gap-4 animate-fade-in">
+    <aside className="bg-[#171717] rounded-lg shadow-xl p-4 w-full max-w-xs sticky top-6 self-start flex flex-col gap-4">
       <h2 className="text-xl font-bold text-white mb-2">Resources Cart</h2>
       {loading ? (
         <div className="flex justify-center items-center py-8"><span className="loader" /></div>
@@ -24,7 +24,7 @@ export default function ResourcesCartSidebar() {
               {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={40} height={40} className="w-10 h-10 object-contain rounded" />}
               <div className="flex-1">
                 <div className="font-semibold text-white text-sm truncate">{item.name}</div>
-                <div className="text-blue-400 text-xs">${typeof item.price === 'number' ? item.price.toFixed(2) : parseFloat(item.price).toFixed(2)}</div>
+                <div className="text-blue-400 text-xs">${Number(item.price).toFixed(2)}</div>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={async () => await updateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 bg-[#333] text-white rounded" disabled={loading || item.quantity <= 1}>-</button>

@@ -75,7 +75,8 @@ export default function GemsPage() {
       mightRangeLabel: mightRange.label,
       pricePer100k: mightRange.price,
       gemCost: addModalGem.gemCost,
-    });
+      mode: 'add',
+    } as any);
     setAddModalGem(null);
     setAddModalOpen(false);
   };
@@ -216,7 +217,8 @@ export default function GemsPage() {
               mightRangeLabel: range.label,
               pricePer100k: range.price,
               gemCost: pendingGem.gemCost,
-            });
+              mode: 'add',
+            } as any);
             setPendingGem(null);
           }
         }}

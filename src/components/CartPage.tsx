@@ -16,7 +16,7 @@ export default function CartPage({
   showSummary?: boolean;
   showPlaceOrder?: boolean;
 }) {
-  const { cart, updateQuantity, removeFromCart, loading } = useCart();
+  const { cart, updateQuantity, removeFromCart, loading, refetch } = useCart();
   const router = useRouter();
   const [placingOrder, setPlacingOrder] = React.useState(false);
   const [orderError, setOrderError] = React.useState("");
@@ -49,146 +49,97 @@ export default function CartPage({
     router.push("/payment");
   };
 
+  const lastRefetchRef = React.useRef(0);
+  React.useEffect(() => {
+    const now = Date.now();
+    if (now - lastRefetchRef.current > 2000) {
+      refetch();
+      lastRefetchRef.current = now;
+    }
+  }, [refetch]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a] p-4 animate-fade-in relative">
-      {showSummary && (
-        <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl z-10"
-          onClick={() => window.history.back()}
-          aria-label="Close"
-        >
-          &times;
-        </button>
-      )}
-      <div className="w-full max-w-3xl bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-10 flex flex-col gap-8">
-        <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 text-white text-center drop-shadow-lg bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-fade-in">{title}</h1>
-        {loading ? (
-          <div className="flex justify-center items-center py-12"><span className="loader" /></div>
-        ) : gemsBelowMin && (
-          <div className="mb-4 p-3 bg-red-900 text-red-300 rounded text-center font-semibold">
-            Minimum purchase is 100,000 gems.
-          </div>
-        )}
-        {/* Cart Items List */}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a] p-4">
+      <div className="w-full max-w-xl bg-[#23232b] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-10 flex flex-col gap-8">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-white mb-4 tracking-tight">Checkout</h1>
+        {/* Cart Items */}
         <div className="flex flex-col gap-4">
-          <AnimatePresence>
             {items.length === 0 && !loading ? (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                className="text-gray-400 text-center py-12"
-              >
-                Your cart is empty.
-              </motion.div>
+            <div className="text-gray-400 text-center py-12">Your cart is empty.</div>
             ) : (
               items.map(item => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  layout
-                  className="bg-white/10 backdrop-blur-md rounded-xl shadow-lg p-4 flex flex-col sm:flex-row gap-4 items-center hover:bg-white/20 transition-transform hover:scale-[1.01] border border-white/10"
-                >
+              <div key={item.id} className="flex flex-col sm:flex-row bg-[#181c24] rounded-lg p-4 border border-white/10 gap-2 sm:gap-4 items-start sm:items-center">
+                <div className="flex flex-row w-full items-start gap-3">
                   {item.imageUrl && (
-                    <Image src={item.imageUrl} alt={item.name} width={56} height={56} className="w-14 h-14 object-contain rounded bg-black/20 border border-white/10" />
+                    <Image src={item.imageUrl} alt={item.name} width={48} height={48} className="w-12 h-12 object-contain rounded bg-black/20 border border-white/10 flex-shrink-0" />
                   )}
-                  <div className="flex-1 flex flex-col gap-1 min-w-0">
-                    <div className="font-bold text-white text-lg truncate">{item.name}</div>
-                    <div className="text-blue-400 text-sm">
-                      {item.category === 'GEMS' ? (
-                        <>
-                          {(item.gemCost || 0) * item.quantity} Gems
-                          {item.pricePer100k && item.gemCost && (
-                            <> ({getGemsDollarPrice(item)})</>
-                          )}
-                          {item.mightRange && (
-                            <span className="ml-2 text-xs text-green-400">
-                              ({item.mightRange.replace('-', ' - ')}m)
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <>${(item.price * item.quantity).toFixed(2)}</>
-                      )}
-                    </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-start">
+                    <div className="font-semibold text-white text-base break-words whitespace-normal">{item.name}</div>
+                    {item.category === 'GEMS' && (
+                      <div className="text-blue-400 text-xs mt-1">
+                        Gems: {(item.gemCost || 0) * item.quantity} {item.pricePer100k && item.gemCost && (
+                          <>(${getGemsDollarPrice(item)})</>
+                        )}
+                        {item.mightRange && (
+                          <span className="ml-2 text-xs text-green-400">
+                            ({item.mightRange.replace('-', ' - ')}m)
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button type="button" onClick={async (e) => {
-                      e.stopPropagation();
-                      console.log("MINUS CLICKED");
-                      try {
-                        await updateQuantity(item.id, item.quantity - 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel });
-                      } catch (err) {
-                        console.error("Error in minus button:", err);
-                      }
-                    }} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading || item.quantity <= 1}>-</button>
-                    <input
-                      type="number"
-                      min={1}
-                      value={item.quantity}
-                      onChange={e => updateQuantity(
-                        item.id,
-                        Math.max(1, Number(e.target.value)),
-                        { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel }
-                      )}
-                      className="w-16 px-2 py-1 rounded bg-[#23272f] text-white border border-[#333] text-center"
-                      disabled={loading}
-                      style={{ width: 48 }}
-                    />
-                    <button type="button" onClick={async (e) => {
-                      e.stopPropagation();
-                      console.log("PLUS CLICKED");
-                      try {
-                        await updateQuantity(item.id, item.quantity + 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel });
-                      } catch (err) {
-                        console.error("Error in plus button:", err);
-                      }
-                    }} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading}>+</button>
-                    <button type="button" onClick={async () => await removeFromCart(item.id)} className="ml-2 text-red-400 hover:text-red-600 transition" disabled={loading} title="Remove">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5V19a2 2 0 002 2h8a2 2 0 002-2V7.5M4 7.5h16M9.5 7.5V5a2 2 0 012-2h1a2 2 0 012 2v2.5" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 11v6M14 11v6" />
-                      </svg>
-                    </button>
-                  </div>
-                </motion.div>
+                </div>
+                <div className="flex flex-row justify-end items-center w-full gap-2 mt-2 sm:mt-0">
+                  <button type="button" onClick={async () => await updateQuantity(item.id, item.quantity - 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel })} className="px-2 py-1 bg-[#23272f] text-white rounded" disabled={loading || item.quantity <= 1}>-</button>
+                  <input
+                    type="number"
+                    min={1}
+                    value={item.quantity}
+                    onChange={e => updateQuantity(
+                      item.id,
+                      Math.max(1, Number(e.target.value)),
+                      { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel }
+                    )}
+                    onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
+                    className="w-14 px-2 py-1 rounded bg-[#23272f] text-white border border-[#333] text-center no-spinner"
+                    disabled={loading}
+                  />
+                  <button type="button" onClick={async () => await updateQuantity(item.id, item.quantity + 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel })} className="px-2 py-1 bg-[#23272f] text-white rounded" disabled={loading}>+</button>
+                  <button type="button" onClick={async () => await removeFromCart(item.id)} className="ml-2 text-red-400" disabled={loading} title="Remove">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5V19a2 2 0 002 2h8a2 2 0 002-2V7.5M4 7.5h16M9.5 7.5V5a2 2 0 012-2h1a2 2 0 012 2v2.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 11v6M14 11v6" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
               ))
             )}
-          </AnimatePresence>
         </div>
         {/* Order Summary */}
-        {showSummary && items.length > 0 && !loading && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 bg-gradient-to-br from-blue-900/40 via-purple-900/30 to-transparent rounded-2xl p-8 shadow-2xl border border-white/10 backdrop-blur-xl"
-          >
-            <h2 className="text-2xl font-bold mb-4 text-white text-center">Order Summary</h2>
-            <div className="flex flex-col gap-3 text-white text-lg">
-              {cart.length > 0 && (
-                <>
+        {showSummary && (
+          <div className="mt-4 bg-[#23232b] rounded-xl p-6 border border-white/10 flex flex-col gap-4">
+            <h2 className="text-lg font-bold text-white text-center mb-2">Order Summary</h2>
+            {items.length === 0 ? (
+              <div className="text-gray-400 text-center py-4">Your cart is empty.</div>
+            ) : (
+              <div className="flex flex-col gap-2 text-white text-base">
                   <div className="flex justify-between"><span>Gems:</span><span>${gemsSubtotal.toFixed(2)} ({cart.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0)} Gems)</span></div>
                   <div className="flex justify-between"><span>Resources:</span><span>${cart.filter(i => i.category === 'RESOURCES').reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}</span></div>
-                  <div className="flex justify-between font-bold text-blue-400 mt-2 text-xl"><span>Total:</span><span>${(gemsSubtotal + cart.filter(i => i.category === 'RESOURCES').reduce((sum, i) => sum + i.price * i.quantity, 0)).toFixed(2)}</span></div>
-                </>
+                <div className="flex justify-between font-bold text-blue-400 mt-2 text-lg border-t border-white/10 pt-2"><span>Total:</span><span>${(gemsSubtotal + cart.filter(i => i.category === 'RESOURCES').reduce((sum, i) => sum + i.price * i.quantity, 0)).toFixed(2)}</span></div>
+              </div>
               )}
-            </div>
             {showPlaceOrder && (
-              <>
-                {orderError && <div className="text-red-400 text-sm mb-2 text-center font-semibold bg-red-900/30 rounded py-2 px-3 animate-fade-in">{orderError}</div>}
                 <button
-                  className="w-full mt-8 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:to-pink-700 text-white font-bold py-4 rounded-xl text-xl shadow-lg transition-transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={gemsBelowMin || placingOrder}
+                className="w-full mt-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg text-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={items.length === 0 || gemsBelowMin || placingOrder || loading}
                   onClick={handlePlaceOrder}
                 >
                   {placingOrder ? "Placing Order..." : "Place Order"}
                 </button>
-              </>
             )}
-          </motion.div>
+            {orderError && <div className="text-red-400 text-sm mt-2 text-center font-semibold bg-red-900/30 rounded py-2 px-3">{orderError}</div>}
+          </div>
         )}
       </div>
     </div>

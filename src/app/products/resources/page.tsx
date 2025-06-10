@@ -35,7 +35,7 @@ export default function ResourcesPage() {
               <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 12.93V17h-2v-2.07A6.002 6.002 0 014 11H2v-2h2a6.002 6.002 0 015-5.93V3h2v2.07A6.002 6.002 0 0116 9h2v2h-2a6.002 6.002 0 01-5 5.93z"/></svg>
             </span>
             <span className="font-bold text-base text-green-100 drop-shadow">Resources Cart</span>
-            <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">${totalResources.toFixed(0)}</span>
+            <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">${totalResources.toFixed(2)}</span>
           </div>
         </div>
       </div>

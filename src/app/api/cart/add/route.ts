@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!decoded || !decoded.uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    const { productId, quantity = 1, mightRange, mightRangeLabel, pricePer100k, gemCost } = await req.json();
+    const { productId, quantity = 1, mightRange, mightRangeLabel, pricePer100k, gemCost, mode } = await req.json();
     if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
     // Find or create cart
     let cart = await prisma.cart.findUnique({ where: { userEmail: user.email } });
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       await prisma.cartItem.update({
         where: { id: existing.id },
         data: {
-          quantity,
+          quantity: mode === 'add' ? existing.quantity + quantity : quantity,
           mightRange,
           mightRangeLabel,
           pricePer100k,
