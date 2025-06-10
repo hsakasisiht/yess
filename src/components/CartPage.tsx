@@ -116,10 +116,38 @@ export default function CartPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={async () => await updateQuantity(item.id, item.quantity - 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel })} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading || item.quantity <= 1}>-</button>
-                    <span className="px-3 text-white font-bold text-lg">{item.quantity}</span>
-                    <button onClick={async () => await updateQuantity(item.id, item.quantity + 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel })} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading}>+</button>
-                    <button onClick={async () => await removeFromCart(item.id)} className="ml-2 text-red-400 hover:text-red-600 transition" disabled={loading} title="Remove">
+                    <button type="button" onClick={async (e) => {
+                      e.stopPropagation();
+                      console.log("MINUS CLICKED");
+                      try {
+                        await updateQuantity(item.id, item.quantity - 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel });
+                      } catch (err) {
+                        console.error("Error in minus button:", err);
+                      }
+                    }} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading || item.quantity <= 1}>-</button>
+                    <input
+                      type="number"
+                      min={1}
+                      value={item.quantity}
+                      onChange={e => updateQuantity(
+                        item.id,
+                        Math.max(1, Number(e.target.value)),
+                        { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel }
+                      )}
+                      className="w-16 px-2 py-1 rounded bg-[#23272f] text-white border border-[#333] text-center"
+                      disabled={loading}
+                      style={{ width: 48 }}
+                    />
+                    <button type="button" onClick={async (e) => {
+                      e.stopPropagation();
+                      console.log("PLUS CLICKED");
+                      try {
+                        await updateQuantity(item.id, item.quantity + 1, { gemCost: item.gemCost, mightRange: item.mightRange, pricePer100k: item.pricePer100k, mightRangeLabel: item.mightRangeLabel });
+                      } catch (err) {
+                        console.error("Error in plus button:", err);
+                      }
+                    }} className="px-2 py-1 bg-[#23272f] text-white rounded hover:bg-blue-700 transition" disabled={loading}>+</button>
+                    <button type="button" onClick={async () => await removeFromCart(item.id)} className="ml-2 text-red-400 hover:text-red-600 transition" disabled={loading} title="Remove">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 7.5V19a2 2 0 002 2h8a2 2 0 002-2V7.5M4 7.5h16M9.5 7.5V5a2 2 0 012-2h1a2 2 0 012 2v2.5" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10 11v6M14 11v6" />
