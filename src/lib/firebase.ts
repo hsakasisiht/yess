@@ -15,4 +15,5 @@ if (typeof window !== 'undefined') {
   app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 }
 
-export const auth = app ? getAuth(app) : undefined; 
+// Always export a valid auth object on the client
+export const auth = typeof window !== 'undefined' && app ? getAuth(app) : null; 

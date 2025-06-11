@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { HomeIcon, ShoppingCartIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, ShoppingCartIcon, Bars3Icon, XMarkIcon, ChatBubbleLeftRightIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
@@ -10,12 +10,10 @@ import { useAuth } from "../context/AuthContext";
 import Image from 'next/image';
 
 const navLinks = [
-  { name: "Home", href: "/", icon: <HomeIcon className="h-5 w-5" /> },
-  { name: "Gems", href: "/products/gems", icon: <Image src="/gems.png" width={20} height={20} className="h-5 w-5" alt="Gems" /> },
-  { name: "Resources", href: "/products/resources", icon: <Image src="/rss.png" width={20} height={20} className="h-5 w-5" alt="Resources" /> },
-  { name: "Bots", href: "/products/bots", icon: <Image src="/bot.png" width={20} height={20} className="h-5 w-5" alt="Bots" /> },
-  { name: "Contact Us", href: "/contact", icon: null },
-  { name: "Social", href: "#", icon: null },
+  { name: "Gems", href: "/products/gems", icon: "gems" },
+  { name: "Resources", href: "/products/resources", icon: "resources" },
+  { name: "Contact Us", href: "/contact", icon: "contact" },
+  { name: "Social", href: "/social", icon: "social" },
 ];
 
 export default function MobileNavbar({ pageName }: { pageName: string }) {
@@ -75,17 +73,36 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-white font-semibold text-base hover:bg-[#23272f] transition-all duration-150 ${pathname === link.href ? 'bg-[#23272f]' : ''}`}
                     onClick={() => setOpen(false)}
                   >
-                    {link.icon}
+                    {link.icon === "gems" && (
+                      <Image src="/gems.png" width={20} height={20} className="h-5 w-5" alt="Gems" />
+                    )}
+                    {link.icon === "resources" && (
+                      <Image src="/rss.png" width={20} height={20} className="h-5 w-5" alt="Resources" />
+                    )}
+                    {link.icon === "contact" && (
+                      <ChatBubbleLeftRightIcon className="h-5 w-5" />
+                    )}
+                    {link.icon === "social" && (
+                      <UserGroupIcon className="h-5 w-5" />
+                    )}
                     <span>{link.name}</span>
                   </Link>
                 ))}
               </div>
-              {/* Logout Button at Bottom */}
+              {/* My Orders and Logout at Bottom */}
               {user && (
-                <div className="mt-auto mb-8 flex justify-center">
+                <div className="mt-auto mb-8 flex flex-col gap-4 w-full px-4">
+                  <Link
+                    href="/account"
+                    className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-base shadow transition-all justify-center"
+                    onClick={() => setOpen(false)}
+                  >
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    My Orders
+                  </Link>
                   <button
-                    onClick={() => { signOut(auth); setOpen(false); }}
-                    className="w-11/12 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg text-base shadow transition-all"
+                    onClick={async () => { await signOut(auth); setOpen(false); router.replace('/login'); }}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg text-base shadow transition-all"
                   >
                     Logout
                   </button>
@@ -106,4 +123,4 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
       </AnimatePresence>
     </>
   );
-} 
+}

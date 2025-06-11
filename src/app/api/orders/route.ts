@@ -1,27 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
 import { PrismaClient } from '@prisma/client';
-import { cookies } from 'next/headers';
-import '../../../lib/firebaseAdmin';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
-  try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get('session')?.value;
-    if (!sessionCookie) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const decoded = await getAuth().verifySessionCookie(sessionCookie, true);
-    if (!decoded || !decoded.uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } });
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    const orders = await prisma.order.findMany({
-      where: { userId: user.id },
-      include: { items: { include: { product: true } } },
-      orderBy: { createdAt: 'desc' },
-    });
-    return NextResponse.json({ orders });
-  } catch (error) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const { userEmail, userName, items, total, invoiceId } = body;
+  if (!userEmail || !userName || !items || typeof total !== 'number') {
+    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
+  // Find or create user
+  let user = await prisma.user.findUnique({ where: { email: userEmail } });
+  if (!user) {
+    user = await prisma.user.create({ data: { email: userEmail, name: userName } });
+  }
+  // Create order
+  const order = await prisma.order.create({
+    data: {
+      userId: user.id,
+      invoiceId: invoiceId || undefined,
+      items,
+      total,
+    },
+  });
+  return NextResponse.json({ id: order.id });
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const userEmail = searchParams.get('userEmail');
+  if (!userEmail) {
+    return NextResponse.json({ error: 'Missing userEmail' }, { status: 400 });
+  }
+  const user = await prisma.user.findUnique({ where: { email: userEmail } });
+  if (!user) {
+    return NextResponse.json({ orders: [] });
+  }
+  const userOrders = await prisma.order.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+    include: {
+      items: {
+        include: {
+          product: true
+        }
+      }
+    }
+    });
+  return NextResponse.json({ orders: userOrders });
 } 

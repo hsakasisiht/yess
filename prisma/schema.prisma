@@ -20,6 +20,7 @@ model User {
   name      String
   role      String   @default("user") // user or admin
   orders    Order[]
+  invoices  Invoice[]
   createdAt DateTime @default(now())
 }
 
@@ -49,6 +50,8 @@ model Order {
   id            String      @id @default(uuid())
   user          User        @relation(fields: [userId], references: [id])
   userId        String
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id])
+  invoiceId     String?     @unique
   items         OrderItem[]
   total         Int
   status        String      @default("pending") // Order status: pending, processing, done, etc.
@@ -85,4 +88,15 @@ model CartItem {
   mightRangeLabel String?  // e.g. "400m - 799m"
   pricePer100k    Float?   // e.g. 4.45
   gemCost         Int?     // number of gems for this item
+}
+
+model Invoice {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  items      Json     // Array of items (name, quantity, price, etc.)
+  total      Float
+  status     String   // e.g., "UNPAID", "PAID"
+  createdAt  DateTime @default(now())
+  order      Order?
 }

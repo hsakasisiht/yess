@@ -10,7 +10,6 @@ import Image from 'next/image';
 const productCategories = [
   { name: "Gems", href: "/products/gems", icon: "/gems.png" },
   { name: "Resources", href: "/products/resources", icon: "/rss.png" },
-  { name: "Bots", href: "/products/bots", icon: "/bot.png" },
 ];
 
 export default function Navbar() {
@@ -52,7 +51,7 @@ export default function Navbar() {
           )}
         </div>
         <Link href="/contact" className="text-white hover:text-blue-400 font-semibold px-3 py-2 rounded transition">Contact Us</Link>
-        <Link href="#" className="text-white hover:text-blue-400 font-semibold px-3 py-2 rounded transition">Social</Link>
+        <Link href="/social" className="text-white hover:text-blue-400 font-semibold px-3 py-2 rounded transition">Social</Link>
       </div>
       <div className="flex items-center gap-2">
         <Link href="/cart/checkout" className="flex items-center justify-center bg-transparent hover:bg-[#222] text-white p-2 rounded transition">

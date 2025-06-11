@@ -6,7 +6,6 @@ import Image from 'next/image';
 const categories = [
   { name: 'Gems', href: '/products/gems', icon: '/gems.png' },
   { name: 'Resources', href: '/products/resources', icon: '/rss.png' },
-  { name: 'Bots', href: '/products/bots', icon: '/bot.png' },
 ];
 
 export default function Home() {

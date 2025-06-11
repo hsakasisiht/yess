@@ -14,6 +14,7 @@ export interface CartItem {
   mightRange?: string; // for gems
   pricePer100k?: number; // for gems pricing
   mightRangeLabel?: string; // for gems
+  productId: string;
 }
 
 interface CartContextType {
@@ -24,6 +25,7 @@ interface CartContextType {
   totalCount: number;
   loading: boolean;
   refetch: () => Promise<void>;
+  clearCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -69,6 +71,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           mightRange: item.mightRange,
           pricePer100k: item.pricePer100k,
           mightRangeLabel: item.mightRangeLabel,
+          productId: item.productId,
         }))
       );
     } catch (err) {
@@ -126,6 +129,25 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     await addToCart(productId, quantity, options);
   };
 
+  // Clear all items from cart
+  const clearCart = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch('/api/cart/clear', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to clear cart');
+      await fetchCart();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Real-time polling (every 5s) and on tab focus
   useEffect(() => {
     if (!user) return;
@@ -135,7 +157,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const totalCount = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, totalCount, loading, refetch: fetchCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, totalCount, loading, refetch: fetchCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );

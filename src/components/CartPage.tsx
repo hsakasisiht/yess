@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from "framer-motion";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export default function CartPage({
   title,
@@ -16,7 +17,7 @@ export default function CartPage({
   showSummary?: boolean;
   showPlaceOrder?: boolean;
 }) {
-  const { cart, updateQuantity, removeFromCart, loading, refetch } = useCart();
+  const { cart, updateQuantity, removeFromCart, loading, refetch, clearCart } = useCart();
   const router = useRouter();
   const [placingOrder, setPlacingOrder] = React.useState(false);
   const [orderError, setOrderError] = React.useState("");
@@ -25,6 +26,7 @@ export default function CartPage({
   const totalGems = items.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0);
   const isCheckout = showSummary;
   const gemsBelowMin = isCheckout && totalGems > 0 && totalGems < 100000;
+  const { dbUser } = useAuth();
 
   // Calculate subtotal for gems using pricePer100k
   const gemsSubtotal = items
@@ -46,7 +48,47 @@ export default function CartPage({
   };
 
   const handlePlaceOrder = async () => {
-    router.push("/payment");
+    setPlacingOrder(true);
+    setOrderError("");
+    try {
+      const invoiceData = {
+        items: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          category: item.category,
+          gemCost: item.gemCost,
+          pricePer100k: item.pricePer100k,
+          mightRange: item.mightRange,
+          mightRangeLabel: item.mightRangeLabel,
+          productId: item.productId,
+        })),
+        total: items.reduce((sum, item) => {
+          if (item.category === 'GEMS' && item.pricePer100k && item.gemCost) {
+            return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
+          }
+          return sum + (item.price * item.quantity);
+        }, 0),
+        userName: dbUser?.name || 'Customer',
+        userEmail: dbUser?.email || '',
+      };
+      const res = await fetch('/api/invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(invoiceData),
+      });
+      const data = await res.json();
+      if (data.id) {
+        await clearCart();
+        router.push(`/invoice/${data.id}`);
+      } else {
+        setOrderError('Failed to create invoice.');
+      }
+    } catch (err) {
+      setOrderError('Failed to create invoice.');
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   const lastRefetchRef = React.useRef(0);
@@ -59,7 +101,7 @@ export default function CartPage({
   }, [refetch]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a] p-4">
+    <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a] p-4 ${showSummary ? 'mt-20 md:mt-24 lg:mt-0' : ''}`}>
       <div className="w-full max-w-xl bg-[#23232b] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-10 flex flex-col gap-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-white mb-4 tracking-tight">Checkout</h1>
         {/* Cart Items */}

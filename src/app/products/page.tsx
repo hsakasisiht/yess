@@ -4,7 +4,6 @@ import Image from 'next/image';
 const categories = [
   { name: 'Gems', href: '/products/gems', icon: '/gem.svg' },
   { name: 'Resources', href: '/products/resources', icon: '/resources.svg' },
-  { name: 'Bots', href: '/products/bots', icon: '/bot.svg' },
 ];
 
 export default function ProductsPage() {
