@@ -27,7 +27,9 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
       {/* Top Nav */}
       <nav className="fixed top-0 left-0 w-full h-16 bg-[#171717] border-b border-[#222] flex items-center justify-between px-4 z-50 shadow-lg sm:hidden transition-all duration-200">
         <button onClick={() => setOpen(true)} className="p-2 text-white rounded-full hover:bg-[#222] transition"><Bars3Icon className="h-8 w-8" /></button>
-        <span className="text-white font-extrabold text-xl text-center flex-1 absolute left-0 right-0 mx-auto w-fit pointer-events-none drop-shadow-lg tracking-wide">{pageName}</span>
+        <span className="flex-1 flex justify-center items-center pointer-events-none">
+          <img src="/1.png" alt="KONOHA BAZAR Logo" className="h-15 w-24 object-contain" />
+        </span>
         {user ? (
           <button onClick={() => router.push('/cart/checkout')} className="p-2 text-white rounded-full hover:bg-[#222] transition"><ShoppingCartIcon className="h-8 w-8" /></button>
         ) : (
@@ -123,4 +125,4 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
       </AnimatePresence>
     </>
   );
-}
+} 

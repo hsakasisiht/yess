@@ -19,7 +19,7 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (productId: string, quantity?: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>>) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, options?: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> & { mode?: string })) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>>) => Promise<void>;
   totalCount: number;
@@ -83,7 +83,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Add or update item in cart
-  const addToCart = async (productId: string, quantity = 1, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = undefined) => {
+  const addToCart = async (productId: string, quantity = 1, options: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> & { mode?: string }) = undefined) => {
     if (!user) return;
     setLoading(true);
     try {

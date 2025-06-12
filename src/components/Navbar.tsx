@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav className="bg-[#171717] border-b border-[#222] px-4 py-2 flex items-center justify-between sticky top-0 z-50 shadow-lg animate-fade-in">
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-2 text-white font-bold text-xl">
-          <HomeIcon className="h-6 w-6 text-blue-400" /> Konoha Shop
+          <img src="/1.png" alt="KONOHA BAZAR Logo" className="h-20 w-35 object-contain" />
         </Link>
         <div className="relative ml-4">
           <button

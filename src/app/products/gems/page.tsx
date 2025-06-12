@@ -53,7 +53,17 @@ export default function GemsPage() {
 
   const handleAddToCart = (gem: unknown) => {
     if (!user) {
-      toast.error('You must be logged in to add items to the cart.');
+      toast.custom((t) => (
+        <div className="bg-red-900/90 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 max-w-xs w-full text-sm relative">
+          <span>You must be logged in to add items to the cart.</span>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="ml-auto px-2 py-1 text-xs bg-red-700 hover:bg-red-800 rounded transition"
+          >
+            Close
+          </button>
+        </div>
+      ));
       return;
     }
     if (!mightRange) {
@@ -67,7 +77,17 @@ export default function GemsPage() {
   const handleAddGems = (quantity: number) => {
     if (!addModalGem || !mightRange) return;
     if (!user) {
-      toast.error('You must be logged in to add items to the cart.');
+      toast.custom((t) => (
+        <div className="bg-red-900/90 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 max-w-xs w-full text-sm relative">
+          <span>You must be logged in to add items to the cart.</span>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="ml-auto px-2 py-1 text-xs bg-red-700 hover:bg-red-800 rounded transition"
+          >
+            Close
+          </button>
+        </div>
+      ));
       return;
     }
     addToCart(addModalGem.id, quantity, {
@@ -104,16 +124,15 @@ export default function GemsPage() {
           {/* Center: Gems Cart */}
           <div className="flex-1 flex justify-center items-center">
             <div
-              className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-blue-500/30 shadow-lg hover:shadow-blue-500/30 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:bg-white/20"
+              className="cart-btn gems"
               onClick={() => setCartOpen(true)}
               title="View Cart"
-              style={{ minWidth: 120 }}
             >
-              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 shadow-inner">
-                <svg className="w-5 h-5 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+              <span className="cart-icon">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
               </span>
-              <span className="font-bold text-base text-blue-100 drop-shadow">Gems Cart</span>
-              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">{totalGems}</span>
+              <span>Gems Cart</span>
+              <span className="cart-badge">{totalGems}</span>
             </div>
           </div>
           {/* Right: Search bar */}
@@ -146,19 +165,18 @@ export default function GemsPage() {
                 </button>
               )}
             </div>
-            {/* Gems Cart Button (right) */}
+            {/* Gems Cart Button (right) for mobile */}
             <div className="flex-1 flex justify-end items-center">
               <div
-                className="relative flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-blue-500/30 shadow-lg hover:shadow-blue-500/30 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:bg-white/20"
+                className="cart-btn gems"
                 onClick={() => setCartOpen(true)}
                 title="View Cart"
-                style={{ minWidth: 120 }}
               >
-                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/30 shadow-inner">
-                  <svg className="w-5 h-5 text-blue-300" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+                <span className="cart-icon">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
                 </span>
-                <span className="font-bold text-base text-blue-100 drop-shadow">Gems Cart</span>
-                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border-2 border-white/20">{totalGems}</span>
+                <span>Gems Cart</span>
+                <span className="cart-badge">{totalGems}</span>
               </div>
             </div>
           </div>

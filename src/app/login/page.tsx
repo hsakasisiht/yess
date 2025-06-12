@@ -78,7 +78,7 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="bg-black/60 backdrop-blur-2xl border border-white/10 p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-5 animate-fade-in"
       >
-        <h1 className="text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">Login to Konoha Shop</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">Login to Konoha Shop</h1>
         {error && <div className="text-red-400 text-sm text-center font-semibold bg-red-900/30 rounded py-2 px-3 animate-fade-in">{error}</div>}
         <input
           type="email"

@@ -224,12 +224,12 @@ async function main() {
   await prisma.product.createMany({
     data: [ 
       // Mixed Resource Packs
-      { name: 'FULL BANK (4B EACH TYPE)', description: '4B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 4.5 },
-      { name: 'HALF BANK (2B EACH TYPE)', description: '2B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 3 },
-      { name: 'FULL BANK NO GOLD (4B EACH BUT NO GOLD)', description: '4B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 4 },
-      { name: 'HALF BANK (2B EACH BUT NO GOLD)', description: '2B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.5 },
-      { name: '11111 (1B EACH TYPE RESOURCES)', description: '1B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.2 },
-      { name: '11110 (1B EACH TYPE BUT NO GOLD)', description: '1B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2 },
+      { name: 'FULL BANK (4B EACH TYPE)', description: '4B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 3.5 },
+      { name: 'HALF BANK (2B EACH TYPE)', description: '2B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.3 },
+      { name: 'FULL BANK NO GOLD (4B EACH BUT NO GOLD)', description: '4B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.5 },
+      { name: 'HALF BANK (2B EACH BUT NO GOLD)', description: '2B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1.5 },
+      { name: '11111 (1B EACH TYPE RESOURCES)', description: '1B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1.6 },
+      { name: '11110 (1B EACH TYPE BUT NO GOLD)', description: '1B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1 },
       // ... add more resources as needed ...
     ],
   });

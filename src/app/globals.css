@@ -42,3 +42,53 @@ body {
 .no-spinner[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* --- Cart Button Styles --- */
+.cart-btn {
+  @apply relative flex items-center gap-2 px-6 py-2 rounded-full text-base drop-shadow
+    backdrop-blur-md shadow-lg transition-all duration-200 cursor-pointer border;
+  min-width: 120px;
+}
+.cart-btn .cart-badge {
+  @apply absolute font-bold rounded-full px-2 py-0.5 shadow border-2 text-xs;
+  top: -18px;
+  right: -18px;
+}
+.cart-btn .cart-icon {
+  @apply flex items-center justify-center w-7 h-7 rounded-full shadow-inner;
+}
+
+/* Gems theme */
+.cart-btn.gems {
+  @apply bg-white/10 border-blue-500/30 text-blue-100 hover:bg-white/20 hover:shadow-blue-500/30;
+}
+.cart-btn.gems .cart-icon {
+  @apply bg-blue-500/20 border-blue-400/30 text-blue-300;
+}
+.cart-btn.gems .cart-badge {
+  @apply bg-blue-600 text-white border-white/20;
+}
+
+/* Resources theme */
+.cart-btn.resources {
+  @apply bg-white/10 border-green-500/30 text-green-100 hover:bg-white/20 hover:shadow-green-500/30;
+}
+.cart-btn.resources .cart-icon {
+  @apply bg-green-500/20 border-green-400/30 text-green-300;
+}
+.cart-btn.resources .cart-badge {
+  @apply bg-green-600 text-white border-white/20;
+}
+
+/* Mobile size */
+@media (max-width: 640px) {
+  .cart-btn {
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.9rem !important;
+    min-width: 90px !important;
+  }
+  .cart-btn .cart-icon {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+  }
+}

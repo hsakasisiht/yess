@@ -72,9 +72,9 @@ export default function AdminOrdersPage() {
         <div className="flex justify-center items-center min-h-[40vh]">Loading...</div>
       ) : (
         <div className="overflow-x-auto w-full max-w-7xl mx-auto rounded-xl shadow-2xl bg-black/50 backdrop-blur-xl border border-white/10">
-          <table className="min-w-full text-white">
+        <table className="min-w-full text-white">
             <thead className="bg-gradient-to-r from-blue-900/40 via-purple-900/30 to-transparent">
-              <tr>
+            <tr>
                 <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Order ID</th>
                 <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">User Email</th>
                 <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Items</th>
@@ -127,12 +127,12 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="px-4 py-2 text-center">
                     {order.invoiceId ? (
-                      <button
+                    <button
                         className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-1 rounded-md font-semibold shadow transition-transform hover:scale-105 text-xs"
                         onClick={() => router.push(`/invoice/${order.invoiceId}`)}
-                      >
+                    >
                         View Invoice
-                      </button>
+                    </button>
                     ) : (
                       <span className="text-gray-500 text-xs">-</span>
                     )}
@@ -140,9 +140,9 @@ export default function AdminOrdersPage() {
                   <td className="px-4 py-2 text-center text-xs text-white/70">{new Date(order.createdAt).toLocaleString()}</td>
                 </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
+      </div>
       )}
     </div>
   );

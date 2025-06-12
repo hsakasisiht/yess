@@ -30,6 +30,7 @@ export default function InvoicePage() {
   const [showModal, setShowModal] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [manualCopyLink, setManualCopyLink] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -60,10 +61,10 @@ export default function InvoicePage() {
     doc.text(`Invoice Date: ${formatDate(invoice?.date ?? '')}`, 14, 34);
     doc.text(`Payment Method: Manual`, 150, 28);
     // Billed To / Pay To
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Billed To', 14, 44);
     doc.text('Pay To', 110, 44);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text(invoice?.userName || 'Customer', 14, 50);
     doc.text(invoice?.userEmail || '', 14, 56);
     doc.text(COMPANY_NAME, 110, 50);
@@ -145,10 +146,9 @@ export default function InvoicePage() {
       `}</style>
       <div className="w-full max-w-3xl mx-auto bg-[#18181b] border border-[#23232b] rounded-2xl shadow-2xl p-0 sm:p-0 mt-18 lg:mt-0 overflow-hidden">
         {/* Header with logo and status */}
-        <div className="flex flex-row items-center justify-between gap-2 bg-[#23232b] px-4 sm:px-8 py-6 border-b border-[#23232b]">
+        <div className="flex flex-row items-center justify-between gap-2 bg-[#23232b] px-4 sm:px-8 py-0 border-b border-[#23232b]">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="KONOHA BAZAR" className="h-10 w-10 sm:h-12 sm:w-12 object-contain rounded bg-black/30 border border-white/10" />
-            <span className="text-lg sm:text-2xl font-extrabold tracking-wide text-white">KONOHA BAZAR</span>
+            <img src="/1.png" alt="KONOHA BAZAR Logo" className="h-25 w-32 object-contain" />
           </div>
           <div className={`font-bold text-base sm:text-xl
             ${invoice?.status === 'PAID' ? 'text-green-400' : invoice?.status === 'FAILED' ? 'text-red-400' : 'text-yellow-400'}`}
@@ -263,6 +263,7 @@ export default function InvoicePage() {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 print:hidden">
           <div className="bg-[#23232b] p-6 sm:p-8 rounded-2xl shadow-xl flex flex-col gap-4 sm:gap-6 w-full max-w-xs">
+            <div className="text-xs text-gray-400 text-center mb-1">Copy the link and send via any one contact below.</div>
             <h2 className="text-xl font-bold text-center mb-2 text-white">Send Invoice Via</h2>
             <button onClick={() => handlePaymentRedirect('whatsapp')} className="bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-semibold">WhatsApp</button>
             <button onClick={() => handlePaymentRedirect('line')} className="bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-lg font-semibold">Line App</button>
@@ -270,15 +271,34 @@ export default function InvoicePage() {
             <button
               onClick={async () => {
                 const invoiceLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/invoice/${id}`;
-                await navigator.clipboard.writeText(invoiceLink);
-                setCopySuccess(true);
-                setTimeout(() => setCopySuccess(false), 1500);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  await navigator.clipboard.writeText(invoiceLink);
+                  setCopySuccess(true);
+                  setTimeout(() => setCopySuccess(false), 1500);
+                } else {
+                  setManualCopyLink(invoiceLink);
+                }
               }}
               className="bg-gray-700 hover:bg-gray-800 text-white py-2 rounded-lg font-semibold"
             >
               {copySuccess ? 'Copied!' : 'Copy Link'}
             </button>
             <button onClick={() => setShowModal(false)} className="mt-2 text-gray-400 hover:text-white">Cancel</button>
+          </div>
+        </div>
+      )}
+      {manualCopyLink && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-[#23232b] p-6 rounded-2xl shadow-xl flex flex-col gap-4 w-full max-w-xs">
+            <div className="text-white text-center mb-2">Copy this link manually:</div>
+            <input
+              type="text"
+              value={manualCopyLink}
+              readOnly
+              className="w-full p-2 rounded bg-[#18181b] text-white border border-blue-400 text-center"
+              onFocus={e => e.target.select()}
+            />
+            <button onClick={() => setManualCopyLink(null)} className="mt-2 text-gray-400 hover:text-white">Close</button>
           </div>
         </div>
       )}
