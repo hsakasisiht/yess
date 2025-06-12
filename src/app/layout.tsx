@@ -67,7 +67,7 @@ export default function RootLayout({
           <CartProvider>
             <div className="hidden sm:block"><Navbar /></div>
             <div className="sm:hidden"><MobileNavbar pageName="Konoha Shop" /></div>
-            {children}
+        {children}
           </CartProvider>
         </AuthProvider>
       </body>

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { userEmail, userName, items, total } = body;
+  const { userEmail, userName, items, total, kingdomNumber } = body;
   if (!userEmail || !userName || !items || typeof total !== 'number') {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       items,
       total,
       status: 'UNPAID',
+      kingdomNumber: kingdomNumber || null,
     },
   });
   // Create order linked to invoice

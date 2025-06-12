@@ -88,6 +88,8 @@ model CartItem {
   mightRangeLabel String?  // e.g. "400m - 799m"
   pricePer100k    Float?   // e.g. 4.45
   gemCost         Int?     // number of gems for this item
+  price           Float?   // locked-in price for resources
+  kingdomNumber   String?  // locked-in kingdom for resources
 }
 
 model Invoice {
@@ -99,4 +101,5 @@ model Invoice {
   status     String   // e.g., "UNPAID", "PAID"
   createdAt  DateTime @default(now())
   order      Order?
+  kingdomNumber String?
 }

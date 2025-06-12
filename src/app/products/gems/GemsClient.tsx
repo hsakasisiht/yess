@@ -90,12 +90,16 @@ export default function GemsClient() {
       ));
       return;
     }
+    // Calculate locked-in price for this gem and might range
+    // price = (gem.gemCost * quantity / 100000) * mightRange.price
+    // But for cart item, store pricePer100k and gemCost, and use them in cart display
     addToCart(addModalGem.id, quantity, {
       mightRange: mightRange.key,
       mightRangeLabel: mightRange.label,
       pricePer100k: mightRange.price,
       gemCost: addModalGem.gemCost,
       mode: 'add',
+      price: ((addModalGem.gemCost * 1) / 100000) * mightRange.price, // locked-in price for 1 unit (will be multiplied by quantity in cart)
     } as any);
     setAddModalGem(null);
     setAddModalOpen(false);

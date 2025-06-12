@@ -13,6 +13,63 @@ function getNumber(val: unknown): number {
   return 0;
 }
 
+function getResourcePrice(resourceName: string, kingdomNumber: string | null): number | null {
+  if (!kingdomNumber) return null;
+  const k = parseInt(kingdomNumber, 10);
+  if (isNaN(k)) return null;
+  const codeMap: { [name: string]: string } = {
+    'FULL BANK (4B EACH TYPE)': '44444',
+    'FULL BANK NO GOLD (4B EACH BUT NO GOLD)': '44440',
+    'HALF BANK (2B EACH TYPE)': '22222',
+    'HALF BANK (2B EACH BUT NO GOLD)': '22220',
+    '11111 (1B EACH TYPE RESOURCES)': '11111',
+    '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
+  };
+  const code = codeMap[resourceName];
+  if (!code) return null;
+  const priceTable: { [range: string]: { [code: string]: number } } = {
+    '1-1685': {
+      '44444': 3.5,
+      '44440': 2.5,
+      '22222': 2.3,
+      '22220': 1.7,
+      '11111': 1.8,
+      '11110': 1.5,
+    },
+    '1686-1739': {
+      '44444': 4,
+      '44440': 2.8,
+      '22222': 2.7,
+      '22220': 2,
+      '11111': 2.2,
+      '11110': 1.8,
+    },
+    '1740-1769': {
+      '44444': 5,
+      '44440': 3.7,
+      '22222': 3.2,
+      '22220': 2.5,
+      '11111': 2.5,
+      '11110': 2.2,
+    },
+    '1770-1780': {
+      '44444': 6,
+      '44440': 4.4,
+      '22222': 3.7,
+      '22220': 2.8,
+      '11111': 2.7,
+      '11110': 2.3,
+    },
+  };
+  let range: string | null = null;
+  if (k >= 1 && k <= 1685) range = '1-1685';
+  else if (k >= 1686 && k <= 1739) range = '1686-1739';
+  else if (k >= 1740 && k <= 1769) range = '1740-1769';
+  else if (k >= 1770 && k <= 1780) range = '1770-1780';
+  if (!range) return null;
+  return priceTable[range][code] || null;
+}
+
 export default function CartModal({ open, onClose, category }: { open: boolean; onClose: () => void; category?: string }) {
   const { cart, updateQuantity, removeFromCart, loading, refetch } = useCart();
   console.log('CartModal cart:', cart);
@@ -21,6 +78,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
   const router = useRouter();
   const [showScrollLine, setShowScrollLine] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [kingdomNumber, setKingdomNumber] = useState<string | null>(null);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -31,6 +89,10 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
     const node = scrollRef.current;
     node.addEventListener('scroll', handleScroll);
     return () => node.removeEventListener('scroll', handleScroll);
+  }, [open]);
+
+  useEffect(() => {
+    setKingdomNumber(localStorage.getItem('kingdomNumber'));
   }, [open]);
 
   // Only call refetch when modal transitions from closed to open
@@ -46,10 +108,8 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
   const gemsTotal = items
     .filter(i => i.category === 'GEMS')
     .reduce((sum, item) => {
-      const gemCost = getNumber(item.gemCost);
-      const pricePer100k = getNumber(item.pricePer100k);
-      if (pricePer100k && gemCost) {
-        return sum + ((gemCost * item.quantity) / 100000) * pricePer100k;
+      if (item.pricePer100k && item.gemCost) {
+        return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
       }
       return sum;
     }, 0);
@@ -64,6 +124,11 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
     }
     return null;
   };
+
+  const resourcesTotal = items.filter(i => i.category === 'RESOURCES').reduce((sum, item) => {
+    const price = item.price ?? 0;
+    return sum + price * item.quantity;
+  }, 0);
 
   if (!open) return null;
   return (
@@ -85,7 +150,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
             {items.map(item => (
               item.category === 'GEMS' ? (
                 <div
-                  key={item.id}
+                  key={`${item.productId}-${item.mightRange || 'default'}`}
                   className="bg-white/10 rounded-lg shadow-lg p-4 hover:bg-white/20 transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500 backdrop-blur-md text-white"
                   style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.25)' }}
                 >
@@ -96,20 +161,14 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                     <div className="flex flex-col justify-center flex-1 min-w-0 pl-3">
                       <div className="font-semibold text-white text-base break-words whitespace-normal">{item.name}</div>
                       <div className="text-blue-400 text-sm">
-                        {item.category === 'GEMS' ? (
-                          <>
-                            {getNumber(item.gemCost) * item.quantity} Gems
-                            {item.pricePer100k && item.gemCost && (
-                              <> ({getGemsDollarPrice(item)})</>
-                            )}
-                            {item.mightRange && (
-                              <span className="ml-2 text-xs text-green-400">
-                                ({item.mightRange.replace('-', ' - ')}m)
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <>${getNumber(item.price).toFixed(2)}</>
+                        {item.gemCost * item.quantity} Gems
+                        {item.pricePer100k && item.gemCost && (
+                          <> (${((item.gemCost * item.quantity) / 100000 * item.pricePer100k).toFixed(2)})</>
+                        )}
+                        {item.mightRangeLabel && (
+                          <span className="ml-2 text-xs text-green-400">
+                            ({item.mightRangeLabel})
+                          </span>
                         )}
                       </div>
                     </div>
@@ -146,7 +205,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                 </div>
               ) : (
                 <div
-                  key={item.id}
+                  key={`${item.productId}-${item.kingdomNumber || 'default'}`}
                   className="bg-white/10 rounded-lg shadow-lg p-4 hover:bg-white/20 transition-transform flex flex-col sm:flex-row gap-2 group border border-transparent hover:border-blue-500 backdrop-blur-md text-white"
                   style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.25)' }}
                 >
@@ -170,7 +229,12 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                             )}
                           </>
                         ) : (
-                          <>${getNumber(item.price).toFixed(2)}</>
+                          <>
+                            ${item.price}
+                            {item.kingdomNumber && (
+                              <span className="ml-1 text-xs text-green-400">(Kingdom {item.kingdomNumber})</span>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -215,7 +279,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
             <div className="text-right text-lg font-bold text-blue-400 mb-2">
               Total: {category === 'GEMS' || items.some(i => i.category === 'GEMS')
                 ? `$${gemsTotal.toFixed(2)} (${items.reduce((sum, i) => sum + getNumber(i.gemCost) * i.quantity, 0)} Gems)`
-                : `$${total.toFixed(2)}`}
+                : `$${resourcesTotal.toFixed(2)}`}
             </div>
             <button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-lg transition-transform hover:scale-105 shadow-lg"

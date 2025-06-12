@@ -21,6 +21,63 @@ function formatDate(dateStr: any) {
   return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+function getResourcePrice(resourceName: string, kingdomNumber: string | null): number | null {
+  if (!kingdomNumber) return null;
+  const k = parseInt(kingdomNumber, 10);
+  if (isNaN(k)) return null;
+  const codeMap: { [name: string]: string } = {
+    'FULL BANK (4B EACH TYPE)': '44444',
+    'FULL BANK NO GOLD (4B EACH BUT NO GOLD)': '44440',
+    'HALF BANK (2B EACH TYPE)': '22222',
+    'HALF BANK (2B EACH BUT NO GOLD)': '22220',
+    '11111 (1B EACH TYPE RESOURCES)': '11111',
+    '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
+  };
+  const code = codeMap[resourceName];
+  if (!code) return null;
+  const priceTable: { [range: string]: { [code: string]: number } } = {
+    '1-1685': {
+      '44444': 3.5,
+      '44440': 2.5,
+      '22222': 2.3,
+      '22220': 1.7,
+      '11111': 1.8,
+      '11110': 1.5,
+    },
+    '1686-1739': {
+      '44444': 4,
+      '44440': 2.8,
+      '22222': 2.7,
+      '22220': 2,
+      '11111': 2.2,
+      '11110': 1.8,
+    },
+    '1740-1769': {
+      '44444': 5,
+      '44440': 3.7,
+      '22222': 3.2,
+      '22220': 2.5,
+      '11111': 2.5,
+      '11110': 2.2,
+    },
+    '1770-1780': {
+      '44444': 6,
+      '44440': 4.4,
+      '22222': 3.7,
+      '22220': 2.8,
+      '11111': 2.7,
+      '11110': 2.3,
+    },
+  };
+  let range: string | null = null;
+  if (k >= 1 && k <= 1685) range = '1-1685';
+  else if (k >= 1686 && k <= 1739) range = '1686-1739';
+  else if (k >= 1740 && k <= 1769) range = '1740-1769';
+  else if (k >= 1770 && k <= 1780) range = '1770-1780';
+  if (!range) return null;
+  return priceTable[range][code] || null;
+}
+
 export default function InvoicePage() {
   const params = useParams();
   const id = (params?.id as string) ?? '';
@@ -31,6 +88,7 @@ export default function InvoicePage() {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [copySuccess, setCopySuccess] = useState(false);
   const [manualCopyLink, setManualCopyLink] = useState<string | null>(null);
+  const [kingdomNumber, setKingdomNumber] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -43,6 +101,25 @@ export default function InvoicePage() {
       })
       .catch(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (invoice && invoice.kingdomNumber) setKingdomNumber(invoice.kingdomNumber);
+    else setKingdomNumber(localStorage.getItem('kingdomNumber'));
+  }, [invoice]);
+
+  // Calculate subtotal for gems using locked-in pricePer100k and gemCost
+  const gemsSubtotal = invoice?.items?.filter((i: any) => i.category === 'GEMS').reduce((sum: number, item: any) => {
+    if (item.pricePer100k && item.gemCost) {
+      return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
+    }
+    return sum;
+  }, 0) || 0;
+
+  // Calculate subtotal for resources using locked-in price
+  const resourcesSubtotal = invoice?.items?.filter((i: any) => i.category === 'RESOURCES').reduce((sum: number, item: any) => {
+    const price = item.price ?? 0;
+    return sum + price * item.quantity;
+  }, 0) || 0;
 
   const handleDownloadPDF = async () => {
     const { default: jsPDF } = await import('jspdf');
@@ -71,14 +148,18 @@ export default function InvoicePage() {
     doc.text(COMPANY_CONTACT, 110, 56);
     // Table
     const tableColumn = ['Description', 'Amount'];
-    const tableRows = invoice.items.map((item: any) => [
+    const tableRows = invoice.items.map((item: any, idx: number) => [
       `${item.name} x${item.quantity}`,
-      `$${getItemTotal(item).toFixed(2)}`
+      `${item.category === 'GEMS' && item.pricePer100k && item.gemCost ? (
+        <>${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}</>
+      ) : (
+        <>${(item.price * item.quantity).toFixed(2)}</>
+      )}`
     ]);
     // Add subtotal and total rows
     tableRows.push([
       { content: 'Subtotal', styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: `$${invoice?.total?.toFixed(2) || '0.00'}`, styles: { fontStyle: 'bold', halign: 'right' } }
+      { content: `$${resourcesSubtotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
     ]);
     tableRows.push([
       { content: 'Total', styles: { halign: 'right', fontStyle: 'bold' } },
@@ -199,18 +280,45 @@ export default function InvoicePage() {
             <tbody>
               {invoice.items.map((item: any, idx: number) => (
                 <tr key={idx} className="border-t border-[#23232b]">
-                  <td className="px-4 py-2 text-left text-white/90 whitespace-pre-line ml-2 sm:ml-0">
-                    {item.name}
+                  <td className="px-4 py-2 text-left text-white/90 whitespace-pre-line ml-2 sm:ml-0 align-top">
+                    {item.category === 'RESOURCES' ? (
+                      <>
+                        <div>{item.name}</div>
+                        {item.kingdomNumber && (
+                          <div className="text-xs text-green-400 mt-1">Kingdom: {item.kingdomNumber}</div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {item.name}
+                        {item.category === 'GEMS' && item.mightRangeLabel && (
+                          <div className="text-xs text-blue-400 mt-1">Might Range: {item.mightRangeLabel}</div>
+                        )}
+                      </>
+                    )}
                     {item.description && <div className="text-xs text-white/60 mt-1">{item.description}</div>}
                   </td>
-                  <td className="px-4 py-2 text-right text-white/90 ml-2 sm:ml-0 align-top">${getItemTotal(item).toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right text-white/90 ml-2 sm:ml-0 align-top">
+                    <div className="font-bold">x{item.quantity}</div>
+                    <div className="text-xs text-white/70 mt-1">
+                      {item.category === 'GEMS' && item.pricePer100k && item.gemCost ? (
+                        <>${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}</>
+                      ) : (
+                        <>${(item.price * item.quantity).toFixed(2)}</>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
             <tfoot className="bg-[#23232b]">
               <tr>
-                <td className="px-4 py-2 text-right font-bold text-white/80">Sub Total</td>
-                <td className="px-4 py-2 text-right font-bold text-white/90">${invoice?.total?.toFixed(2) || '0.00'}</td>
+                <td className="px-4 py-2 text-right font-bold text-white/80">Sub Total (Gems)</td>
+                <td className="px-4 py-2 text-right font-bold text-white/90">${gemsSubtotal.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 text-right font-bold text-white/80">Sub Total (Resources)</td>
+                <td className="px-4 py-2 text-right font-bold text-white/90">${resourcesSubtotal.toFixed(2)}</td>
               </tr>
               {/* Example: taxes/credit, only show if present in data */}
               {invoice.cgst && (
@@ -246,7 +354,7 @@ export default function InvoicePage() {
         <div className="px-2 sm:px-8 py-4 bg-[#18181b] border-t border-[#23232b] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xs text-white/60">To Pay</div>
-            <div className="text-white/90 text-base font-bold">${invoice?.total?.toFixed(2) || '0.00'}</div>
+            <div className="text-white/90 text-base font-bold">${resourcesSubtotal.toFixed(2)}</div>
           </div>
           <div className="flex flex-row gap-2 sm:gap-4 print:hidden mt-2 sm:mt-0 justify-end">
             <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-5 rounded-lg font-semibold text-base shadow transition">

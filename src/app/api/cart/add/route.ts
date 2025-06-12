@@ -15,15 +15,22 @@ export async function POST(req: NextRequest) {
     if (!decoded || !decoded.uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const user = await prisma.user.findUnique({ where: { firebaseUid: decoded.uid } });
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    const { productId, quantity = 1, mightRange, mightRangeLabel, pricePer100k, gemCost, mode } = await req.json();
+    const { productId, quantity = 1, mightRange, mightRangeLabel, pricePer100k, gemCost, mode, price, kingdomNumber } = await req.json();
     if (!productId) return NextResponse.json({ error: 'Missing productId' }, { status: 400 });
     // Find or create cart
     let cart = await prisma.cart.findUnique({ where: { userEmail: user.email } });
     if (!cart) {
       cart = await prisma.cart.create({ data: { userEmail: user.email } });
     }
-    // Check if item exists
-    const existing = await prisma.cartItem.findFirst({ where: { cartId: cart.id, productId } });
+    // Check if item exists (match on productId and mightRange for gems, kingdomNumber for resources)
+    let existing;
+    if (mightRange) {
+      existing = await prisma.cartItem.findFirst({ where: { cartId: cart.id, productId, mightRange } });
+    } else if (kingdomNumber) {
+      existing = await prisma.cartItem.findFirst({ where: { cartId: cart.id, productId, kingdomNumber } });
+    } else {
+      existing = await prisma.cartItem.findFirst({ where: { cartId: cart.id, productId } });
+    }
     if (existing) {
       // Update quantity and extra fields
       await prisma.cartItem.update({
@@ -34,6 +41,8 @@ export async function POST(req: NextRequest) {
           mightRangeLabel,
           pricePer100k,
           gemCost,
+          price,
+          kingdomNumber,
         },
       });
     } else {
@@ -47,6 +56,8 @@ export async function POST(req: NextRequest) {
           mightRangeLabel,
           pricePer100k,
           gemCost,
+          price,
+          kingdomNumber,
         },
       });
     }

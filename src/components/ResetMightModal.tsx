@@ -16,7 +16,7 @@ export default function ResetMightModal({ open, onClose, onReset, mightLabel }: 
         <p className="mb-6">Are you sure you want to reset your might range{mightLabel ? ` (${mightLabel})` : ''}?<br />This will remove your current selection.</p>
         <div className="flex gap-3">
           <button
-            onClick={onReset}
+            onClick={() => { onReset(); onClose(); }}
             className="px-5 py-2 bg-red-700 hover:bg-red-800 text-white rounded font-semibold transition"
           >
             Reset

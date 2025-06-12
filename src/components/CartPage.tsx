@@ -28,7 +28,7 @@ export default function CartPage({
   const gemsBelowMin = isCheckout && totalGems > 0 && totalGems < 100000;
   const { dbUser } = useAuth();
 
-  // Calculate subtotal for gems using pricePer100k
+  // Calculate subtotal for gems using locked-in pricePer100k and gemCost
   const gemsSubtotal = items
     .filter(i => i.category === 'GEMS')
     .reduce((sum, item) => {
@@ -36,6 +36,14 @@ export default function CartPage({
         return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
       }
       return sum;
+    }, 0);
+
+  // Calculate subtotal for resources using locked-in price
+  const resourcesSubtotal = items
+    .filter(i => i.category === 'RESOURCES')
+    .reduce((sum, item) => {
+      const price = item.price ?? 0;
+      return sum + price * item.quantity;
     }, 0);
 
   const getGemsDollarPrice = (item: unknown) => {
@@ -46,6 +54,70 @@ export default function CartPage({
     }
     return null;
   };
+
+  // Add getResourcePrice utility (copy from ResourcesClient)
+  function getResourcePrice(resourceName: string, kingdomNumber: string | null): number | null {
+    if (!kingdomNumber) return null;
+    const k = parseInt(kingdomNumber, 10);
+    if (isNaN(k)) return null;
+    const codeMap: { [name: string]: string } = {
+      'FULL BANK (4B EACH TYPE)': '44444',
+      'FULL BANK NO GOLD (4B EACH BUT NO GOLD)': '44440',
+      'HALF BANK (2B EACH TYPE)': '22222',
+      'HALF BANK (2B EACH BUT NO GOLD)': '22220',
+      '11111 (1B EACH TYPE RESOURCES)': '11111',
+      '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
+    };
+    const code = codeMap[resourceName];
+    if (!code) return null;
+    const priceTable: { [range: string]: { [code: string]: number } } = {
+      '1-1685': {
+        '44444': 3.5,
+        '44440': 2.5,
+        '22222': 2.3,
+        '22220': 1.7,
+        '11111': 1.8,
+        '11110': 1.5,
+      },
+      '1686-1739': {
+        '44444': 4,
+        '44440': 2.8,
+        '22222': 2.7,
+        '22220': 2,
+        '11111': 2.2,
+        '11110': 1.8,
+      },
+      '1740-1769': {
+        '44444': 5,
+        '44440': 3.7,
+        '22222': 3.2,
+        '22220': 2.5,
+        '11111': 2.5,
+        '11110': 2.2,
+      },
+      '1770-1780': {
+        '44444': 6,
+        '44440': 4.4,
+        '22222': 3.7,
+        '22220': 2.8,
+        '11111': 2.7,
+        '11110': 2.3,
+      },
+    };
+    let range: string | null = null;
+    if (k >= 1 && k <= 1685) range = '1-1685';
+    else if (k >= 1686 && k <= 1739) range = '1686-1739';
+    else if (k >= 1740 && k <= 1769) range = '1740-1769';
+    else if (k >= 1770 && k <= 1780) range = '1770-1780';
+    if (!range) return null;
+    return priceTable[range][code] || null;
+  }
+
+  // Get kingdom number from localStorage
+  const [kingdomNumber, setKingdomNumber] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setKingdomNumber(localStorage.getItem('kingdomNumber'));
+  }, []);
 
   const handlePlaceOrder = async () => {
     setPlacingOrder(true);
@@ -62,6 +134,7 @@ export default function CartPage({
           mightRange: item.mightRange,
           mightRangeLabel: item.mightRangeLabel,
           productId: item.productId,
+          kingdomNumber: item.kingdomNumber,
         })),
         total: items.reduce((sum, item) => {
           if (item.category === 'GEMS' && item.pricePer100k && item.gemCost) {
@@ -100,6 +173,16 @@ export default function CartPage({
     }
   }, [refetch]);
 
+  // In resource item display, use getResourcePrice for price
+  const getResourcePriceForItem = (item: unknown) => {
+    if (!item || typeof item !== 'object') return null;
+    const i = item as { name: string; category: string };
+    if (i.category === 'RESOURCES') {
+      return getResourcePrice(i.name, kingdomNumber);
+    }
+    return null;
+  };
+
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a] p-4 ${showSummary ? 'mt-20 md:mt-24 lg:mt-0' : ''}`}>
       <div className="w-full max-w-xl bg-[#23232b] border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-10 flex flex-col gap-8">
@@ -110,7 +193,7 @@ export default function CartPage({
             <div className="text-gray-400 text-center py-12">Your cart is empty.</div>
             ) : (
               items.map(item => (
-              <div key={item.id} className="flex flex-col sm:flex-row bg-[#181c24] rounded-lg p-4 border border-white/10 gap-2 sm:gap-4 items-start sm:items-center">
+              <div key={`${item.productId}-${item.kingdomNumber || item.mightRange || 'default'}`} className="flex flex-col sm:flex-row bg-[#181c24] rounded-lg p-4 border border-white/10 gap-2 sm:gap-4 items-start sm:items-center">
                 <div className="flex flex-row w-full items-start gap-3">
                   {item.imageUrl && (
                     <Image src={item.imageUrl} alt={item.name} width={48} height={48} className="w-12 h-12 object-contain rounded bg-black/20 border border-white/10 flex-shrink-0" />
@@ -120,12 +203,20 @@ export default function CartPage({
                     {item.category === 'GEMS' && (
                       <div className="text-blue-400 text-xs mt-1">
                         Gems: {(item.gemCost || 0) * item.quantity} {item.pricePer100k && item.gemCost && (
-                          <>(${getGemsDollarPrice(item)})</>
+                          <>(${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)})</>
                         )}
-                        {item.mightRange && (
+                        {item.mightRangeLabel && (
                           <span className="ml-2 text-xs text-green-400">
-                            ({item.mightRange.replace('-', ' - ')}m)
+                            ({item.mightRangeLabel})
                           </span>
+                        )}
+                      </div>
+                    )}
+                    {item.category === 'RESOURCES' && (
+                      <div className="text-green-400 text-xs mt-1">
+                        ${item.price}
+                        {item.kingdomNumber && (
+                          <span className="ml-1 text-xs text-green-400">(Kingdom {item.kingdomNumber})</span>
                         )}
                       </div>
                     )}
@@ -167,8 +258,8 @@ export default function CartPage({
             ) : (
               <div className="flex flex-col gap-2 text-white text-base">
                   <div className="flex justify-between"><span>Gems:</span><span>${gemsSubtotal.toFixed(2)} ({cart.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0)} Gems)</span></div>
-                  <div className="flex justify-between"><span>Resources:</span><span>${cart.filter(i => i.category === 'RESOURCES').reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}</span></div>
-                <div className="flex justify-between font-bold text-blue-400 mt-2 text-lg border-t border-white/10 pt-2"><span>Total:</span><span>${(gemsSubtotal + cart.filter(i => i.category === 'RESOURCES').reduce((sum, i) => sum + i.price * i.quantity, 0)).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Resources:</span><span>${resourcesSubtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between font-bold text-blue-400 mt-2 text-lg border-t border-white/10 pt-2"><span>Total:</span><span>${(gemsSubtotal + resourcesSubtotal).toFixed(2)}</span></div>
               </div>
               )}
             {showPlaceOrder && (

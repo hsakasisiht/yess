@@ -41,7 +41,7 @@ function LoginPageContent() {
         const message = (err as { message: string }).message;
         if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
           msg = 'Invalid email or password. Please try again.';
-        } else {
+      } else {
           msg = message;
         }
       }

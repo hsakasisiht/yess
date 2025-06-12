@@ -15,6 +15,7 @@ export interface CartItem {
   pricePer100k?: number; // for gems pricing
   mightRangeLabel?: string; // for gems
   productId: string;
+  kingdomNumber?: string;
 }
 
 interface CartContextType {
@@ -68,7 +69,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           id: item.productId,
           name: item.product?.name ?? '',
           imageUrl: item.product?.imageUrl ?? '',
-          price: item.product?.price ?? 0,
+          price: item.price ?? item.product?.price ?? 0,
           gemCost: item.gemCost ?? 0,
           quantity: item.quantity,
           category: item.product?.category ?? '',
@@ -76,6 +77,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           pricePer100k: item.pricePer100k,
           mightRangeLabel: item.mightRangeLabel,
           productId: item.productId,
+          kingdomNumber: item.kingdomNumber,
         }))
       );
     } catch (err) {

@@ -2,11 +2,14 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  // Delete cart items first to avoid foreign key constraint errors
+  // Delete in the correct order to avoid foreign key constraint errors
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.invoice.deleteMany();
   await prisma.cartItem.deleteMany();
-  // Delete existing products to avoid duplicates
+  await prisma.cart.deleteMany();
   await prisma.product.deleteMany();
-//
+
   // All Gems/Materials from Lords Mobile gems mall
   await prisma.product.createMany({
     data: [
@@ -224,10 +227,10 @@ async function main() {
   await prisma.product.createMany({
     data: [ 
       // Mixed Resource Packs
-      { name: 'FULL BANK (4B EACH TYPE)', description: '4B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 3.5 },
-      { name: 'HALF BANK (2B EACH TYPE)', description: '2B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.3 },
-      { name: 'FULL BANK NO GOLD (4B EACH BUT NO GOLD)', description: '4B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.5 },
-      { name: 'HALF BANK (2B EACH BUT NO GOLD)', description: '2B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1.5 },
+      { name: 'Full Bank (4B EACH TYPE)', description: '4B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 3.5 },
+      { name: 'Half Bank (2B EACH TYPE)', description: '2B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.3 },
+      { name: 'Full Bank NO GOLD (4B EACH BUT NO GOLD)', description: '4B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 2.5 },
+      { name: 'Half Bank (2B EACH BUT NO GOLD)', description: '2B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1.5 },
       { name: '11111 (1B EACH TYPE RESOURCES)', description: '1B of each resource type.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1.6 },
       { name: '11110 (1B EACH TYPE BUT NO GOLD)', description: '1B of each resource type except gold.', imageUrl: '/rss.png', category: 'RESOURCES', price: 1 },
       // ... add more resources as needed ...
