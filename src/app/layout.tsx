@@ -31,6 +31,31 @@ export default function RootLayout({
       <head>
         <title>Konoha Bazar</title>
         <link rel="icon" href="/logoico.ico" />
+        <meta name="description" content="Konoha Bazar - The ultimate online shop for Lords Mobile Gems, Resources, and Bots. Fast, secure, and trusted by gamers." />
+        <link rel="canonical" href="https://konohabazar.store/" />
+        {/* Open Graph Meta Tags */}
+        <meta property="og:title" content="Konoha Bazar" />
+        <meta property="og:description" content="The ultimate online shop for Lords Mobile Gems, Resources, and Bots. Fast, secure, and trusted by gamers." />
+        <meta property="og:image" content="https://konohabazar.store/logo.png" />
+        <meta property="og:url" content="https://konohabazar.store/" />
+        <meta property="og:type" content="website" />
+        {/* Twitter Card Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Konoha Bazar" />
+        <meta name="twitter:description" content="The ultimate online shop for Lords Mobile Gems, Resources, and Bots. Fast, secure, and trusted by gamers." />
+        <meta name="twitter:image" content="https://konohabazar.store/logo.png" />
+        {/* Organization Structured Data */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Konoha Bazar",
+          "url": "https://konohabazar.store/",
+          "logo": "https://konohabazar.store/logo.png",
+          "sameAs": [
+            "https://www.facebook.com/konohabazar", // update with your real social links
+            "https://www.instagram.com/konohabazar"
+          ]
+        }) }} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen overflow-x-hidden`}
@@ -42,7 +67,7 @@ export default function RootLayout({
           <CartProvider>
             <div className="hidden sm:block"><Navbar /></div>
             <div className="sm:hidden"><MobileNavbar pageName="Konoha Shop" /></div>
-        {children}
+            {children}
           </CartProvider>
         </AuthProvider>
       </body>
