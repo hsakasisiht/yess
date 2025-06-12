@@ -160,18 +160,18 @@ export default function OrderDetailsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold order-mobile-status-badge ${order.paymentStatus === 'paid' ? 'bg-green-700/70 text-green-200' : order.paymentStatus === 'pending' ? 'bg-yellow-700/70 text-yellow-200' : 'bg-blue-700/70 text-blue-200'}`}>{order.paymentStatus}</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold order-mobile-status-badge ${order.status === 'done' ? 'bg-green-700/70 text-green-200' : 'bg-purple-700/70 text-purple-200'}`}>{order.status}</span>
-              </div>
-            </div>
+          </div>
+        </div>
             {/* Total and Invoice Button */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2 order-mobile-total-invoice-row">
               <div className="flex items-center gap-2 text-lg font-bold text-white/90">
                 <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 8v8" /></svg>
                 <span className="text-blue-400">${order.items.reduce((total: number, item: any) => {
-              if (item.product.category === 'GEMS' && item.gemCost && item.pricePer100k) {
+            if (item.product.category === 'GEMS' && item.gemCost && item.pricePer100k) {
                     return total + (item.gemCost * item.quantity / 100000) * item.pricePer100k;
-              } else {
+            } else {
                     return total + Number(item.product.price) * item.quantity;
-              }
+            }
                 }, 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
               </div>
               {order.invoiceId && (
@@ -185,10 +185,10 @@ export default function OrderDetailsPage() {
             </div>
             {/* Items Section */}
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-white flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" /></svg>
-                Items
-              </h2>
+        <h2 className="text-2xl font-bold mb-4 text-white flex items-center gap-2">
+          <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" /></svg>
+          Items
+        </h2>
               <div className="flex flex-col gap-4">
                 {order.items.map((item: any) => (
                   <div key={item.id} className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#23232b] rounded-xl shadow p-4 order-mobile-item">
@@ -199,14 +199,14 @@ export default function OrderDetailsPage() {
                     <div className="flex items-center gap-4">
                       <span className="px-3 py-1 rounded-full bg-blue-700/70 text-blue-100 font-bold text-sm order-mobile-qty">Qty: {item.quantity}</span>
                       <span className="font-bold text-lg text-blue-300 text-right min-w-[80px] order-mobile-price">
-                        {item.product.category === 'GEMS' && item.gemCost && item.pricePer100k
-                          ? `$${((item.gemCost * item.quantity / 100000) * item.pricePer100k).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
-                          : `$${Number(item.product.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
-                        }
+                    {item.product.category === 'GEMS' && item.gemCost && item.pricePer100k
+                      ? `$${((item.gemCost * item.quantity / 100000) * item.pricePer100k).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                      : `$${Number(item.product.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                    }
                       </span>
                     </div>
                   </div>
-                ))}
+              ))}
               </div>
             </div>
           </div>
@@ -214,4 +214,4 @@ export default function OrderDetailsPage() {
       </div>
     </>
   );
-}
+} 

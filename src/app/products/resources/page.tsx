@@ -49,19 +49,19 @@ export default function ResourcesPage() {
                   <span className="text-sm sm:text-xl font-semibold text-white text-center">{r.name}</span>
                   <span className="text-xs sm:text-base text-white/70 text-center">{r.description}</span>
                   <span className="text-xs sm:text-lg font-bold text-green-400">${Number(r.price).toFixed(2)}</span>
-                  <button
+                <button
                     className="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-base py-1 px-4 rounded transition"
-                    onClick={() => {
-                      if (!user) {
-                        toast.error('You must be logged in to add items to the cart.');
-                        return;
-                      }
+                  onClick={() => {
+                    if (!user) {
+                      toast.error('You must be logged in to add items to the cart.');
+                      return;
+                    }
                       addToCart(r.id, 1, { mode: 'add' });
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
+                  }}
+                >
+                  Add to Cart
+                </button>
+              </div>
               );
             })}
           </div>

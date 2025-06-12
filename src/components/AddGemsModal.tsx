@@ -38,14 +38,21 @@ export default function AddGemsModal({ open, onClose, onAdd, gem }: {
           {mode === "stack" && (
             <form
               className="flex flex-col items-center gap-3 mt-2 w-full"
-              onSubmit={e => { e.preventDefault(); onAdd(qty); onClose(); }}
+              onSubmit={e => { e.preventDefault(); if (qty >= 1) { onAdd(qty); onClose(); } }}
             >
               <input
                 type="number"
                 min={1}
-                value={qty}
-                onChange={e => setQty(Math.max(1, Number(e.target.value)))}
-                className="w-24 p-2 rounded bg-[#222] text-white border border-[#333] text-center"
+                value={qty === 0 ? '' : qty}
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val === '' || isNaN(Number(val))) {
+                    setQty(0);
+                  } else {
+                    setQty(Number(val));
+                  }
+                }}
+                className="w-24 p-2 rounded bg-[#222] text-white border border-[#333] text-center hide-arrows"
                 placeholder="Quantity"
                 autoFocus
               />
