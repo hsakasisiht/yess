@@ -1,5 +1,7 @@
+import React from 'react';
+
 export const metadata = {
-  title: "Contact Us | Konoha Bazar Buy Lords Mobile Gems | Konoha Bazar | Buy Gems | Lords Mobile Gems | Free Gems | Lords Mobile Gems Shop | Lords Mobile Gems Free | Lords Mobile Buy Gems",
+  title: "Contact Us",
   description: "Contact Konoha Bazar for support, questions, or partnership inquiries. We're here to help you!",
   openGraph: {
     title: "Contact Us | Konoha Bazar Buy Lords Mobile Gems | Konoha Bazar | Buy Gems | Lords Mobile Gems | Free Gems | Lords Mobile Gems Shop | Lords Mobile Gems Free | Lords Mobile Buy Gems",
@@ -18,4 +20,10 @@ export const metadata = {
   alternates: {
     canonical: "https://konohabazar.store/contact-us",
   },
-}; 
+};
+
+import ContactClient from './ContactClient';
+
+export default function ContactPage() {
+  return <ContactClient />;
+} 

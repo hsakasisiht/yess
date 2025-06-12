@@ -57,7 +57,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await fetch('/api/cart', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to fetch cart');
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Cart fetch failed:', res.status, errorText);
+        throw new Error('Failed to fetch cart');
+      }
       const data = await res.json();
       setCart(
         (data.items || []).map((item: any) => ({
