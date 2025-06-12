@@ -32,8 +32,14 @@ export default function SignupPage() {
       await auth.signOut();
       // Redirect to login with a query param to show a message
       router.push("/login?signup=success");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } catch (err: any) {
+      let msg = "An unknown error occurred";
+      if (err && err.code === "auth/email-already-in-use") {
+        msg = "This email is already registered. Please log in or use a different email.";
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
+      setError(msg);
     }
     setLoading(false);
   };

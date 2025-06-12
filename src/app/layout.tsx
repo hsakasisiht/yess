@@ -29,8 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Konoha Shop</title>
-        <link rel="icon" href="logoico.ico" />
+        <title>Konoha Bazar</title>
+        <link rel="icon" href="/logoico.ico" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative min-h-screen overflow-x-hidden`}
