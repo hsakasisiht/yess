@@ -149,7 +149,15 @@ export default function ResourcesClient() {
       return;
     }
     console.log('Adding resource:', resource.name, 'Kingdom:', kingdomNumber, 'Price:', getResourcePrice(resource.name, kingdomNumber));
-    addToCart(resource.id, 1, { mode: 'add', kingdomNumber, price: getResourcePrice(resource.name, kingdomNumber) });
+    addToCart(
+      resource.id,
+      1,
+      {
+        mode: 'add',
+        kingdomNumber,
+        price: getResourcePrice(resource.name, kingdomNumber) ?? resource.price,
+      }
+    );
   };
 
   return (
@@ -163,26 +171,47 @@ export default function ResourcesClient() {
           localStorage.setItem('kingdomNumber', kingdom);
         }}
       />
-      <div className="w-full mb-8 flex flex-row items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-left flex items-center gap-3">
+      <div className="w-full mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-left flex items-center gap-3">
           Resources
+        </h1>
+        {/* Mobile: row of buttons below title, spaced between */}
+        <div className="flex flex-row justify-between items-center w-full mt-3 sm:hidden">
           <button
-            className="ml-2 px-3 py-1 rounded bg-[#222] text-green-400 font-mono text-base border border-green-700 hover:bg-[#333] transition"
+            className="px-3 py-1 rounded bg-[#222] text-green-400 font-mono text-base border border-green-700 hover:bg-[#333] transition"
             onClick={() => setKingdomModalOpen(true)}
             title={kingdomNumber ? `Current: Kingdom ${kingdomNumber}` : 'Set Kingdom Number'}
           >
             {kingdomNumber ? `Kingdom ${kingdomNumber}` : 'Set Kingdom'}
           </button>
-        </h1>
-        <div className="cart-btn resources" onClick={() => setCartOpen(true)} title="View Cart">
-          <span className="cart-icon">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
-          </span>
-          <span>Resources Cart</span>
-          <span className="cart-badge">${resourcesCartTotal.toFixed(2)}</span>
+          <div className="cart-btn resources ml-2" onClick={() => setCartOpen(true)} title="View Cart">
+            <span className="cart-icon">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+            </span>
+            <span>Resources Cart</span>
+            <span className="cart-badge">${resourcesCartTotal.toFixed(2)}</span>
+          </div>
+        </div>
+        {/* Desktop: keep previous layout */}
+        <div className="hidden sm:flex flex-row items-center gap-4 w-full sm:w-auto mt-0">
+          <button
+            className="ml-0 sm:ml-2 px-3 py-1 rounded bg-[#222] text-green-400 font-mono text-base border border-green-700 hover:bg-[#333] transition w-full sm:w-auto"
+            onClick={() => setKingdomModalOpen(true)}
+            title={kingdomNumber ? `Current: Kingdom ${kingdomNumber}` : 'Set Kingdom Number'}
+          >
+            {kingdomNumber ? `Kingdom ${kingdomNumber}` : 'Set Kingdom'}
+          </button>
+          <div className="cart-btn resources w-full sm:w-auto justify-center sm:justify-start" onClick={() => setCartOpen(true)} title="View Cart">
+            <span className="cart-icon">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
+            </span>
+            <span>Resources Cart</span>
+            <span className="cart-badge">${resourcesCartTotal.toFixed(2)}</span>
+          </div>
         </div>
       </div>
-      <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
+      {/* Grid: 2 col on mobile, 3+ on md+ */}
+      <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
         {resources.map((resource: any) => (
           <div
             key={resource.id}
@@ -194,19 +223,19 @@ export default function ResourcesClient() {
                 alt={resource.name}
                 width={64}
                 height={64}
-                className="w-12 h-12 sm:w-16 sm:h-16 object-contain mb-1"
+                className="w-14 h-14 sm:w-16 sm:h-16 object-contain mb-1"
               />
             )}
-            <div className="text-xs sm:text-sm font-semibold text-center truncate w-full">{resource.name}</div>
+            <div className="text-sm sm:text-xs md:text-sm font-semibold text-center truncate w-full">{resource.name}</div>
             {/* Description below name */}
             <div className="text-xs text-gray-300 text-center w-full min-h-[18px]">
               {resource.description || descriptionMap[resource.name] || ''}
             </div>
-            <div className="text-green-400 font-bold text-xs sm:text-sm">
+            <div className="text-green-400 font-bold text-sm sm:text-xs md:text-sm">
               ${getResourcePrice(resource.name, kingdomNumber) ?? resource.price}
             </div>
             <button
-              className="mt-1 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs sm:text-sm transition w-full"
+              className="mt-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-base sm:text-xs md:text-sm transition w-full"
               onClick={() => handleAddToCart(resource)}
             >
               Add

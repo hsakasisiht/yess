@@ -20,9 +20,9 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (productId: string, quantity?: number, options?: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> & { mode?: string })) => Promise<void>;
+  addToCart: (productId: string, quantity?: number, options?: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'quantity' | 'category'>> & { mode?: string })) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>>) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number, options?: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'quantity' | 'category'>>) => Promise<void>;
   totalCount: number;
   loading: boolean;
   refetch: () => Promise<void>;
@@ -89,7 +89,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Add or update item in cart
-  const addToCart = async (productId: string, quantity = 1, options: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> & { mode?: string }) = undefined) => {
+  const addToCart = async (productId: string, quantity = 1, options: (Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'quantity' | 'category'>> & { mode?: string }) = undefined) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -131,7 +131,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Update quantity
-  const updateQuantity = async (productId: string, quantity: number, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'price' | 'quantity' | 'category'>> = undefined) => {
+  const updateQuantity = async (productId: string, quantity: number, options: Partial<Omit<CartItem, 'id' | 'name' | 'imageUrl' | 'quantity' | 'category'>> = undefined) => {
     await addToCart(productId, quantity, options);
   };
 
