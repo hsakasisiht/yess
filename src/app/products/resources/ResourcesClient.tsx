@@ -68,7 +68,7 @@ export default function ResourcesClient() {
     if (!kingdomNumber) return null;
     const k = parseInt(kingdomNumber, 10);
     if (isNaN(k)) return null;
-    // Map resource names to codes
+    // Map resource names to codes (normalize to uppercase)
     const codeMap: { [name: string]: string } = {
       'FULL BANK (4B EACH TYPE)': '44444',
       'FULL BANK NO GOLD (4B EACH BUT NO GOLD)': '44440',
@@ -77,7 +77,7 @@ export default function ResourcesClient() {
       '11111 (1B EACH TYPE RESOURCES)': '11111',
       '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
     };
-    const code = codeMap[resourceName];
+    const code = codeMap[resourceName.toUpperCase()];
     if (!code) return null;
     // Price tables
     const priceTable: { [range: string]: { [code: string]: number } } = {
