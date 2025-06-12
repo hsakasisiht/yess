@@ -18,6 +18,7 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     try {
+      if (!auth) throw new Error("Authentication is not available.");
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       if (name) {
         await updateProfile(cred.user, { displayName: name });
@@ -27,7 +28,10 @@ export default function SignupPage() {
         email: cred.user.email || "",
         name: name || cred.user.displayName || undefined,
       });
-      router.push("/");
+      // Sign out the user after signup
+      await auth.signOut();
+      // Redirect to login with a query param to show a message
+      router.push("/login?signup=success");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     }

@@ -150,7 +150,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Real-time polling (every 5s) and on tab focus
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user.email) return; // Only fetch cart if user is logged in and has an email
     fetchCart();
   }, [user]);
 

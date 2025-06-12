@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../lib/firebase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { syncUser } from "../../lib/syncUser";
 
 export default function LoginPage() {
@@ -11,12 +11,16 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const signupSuccess = searchParams?.get("signup") === "success";
+  const [showSignupSuccess, setShowSignupSuccess] = useState(signupSuccess);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      if (!auth) throw new Error("Authentication is not available.");
       const cred = await signInWithEmailAndPassword(auth, email, password);
       await syncUser({
         firebaseUid: cred.user.uid,
@@ -32,11 +36,16 @@ export default function LoginPage() {
       });
       window.location.href = "/";
     } catch (err: unknown) {
+      let msg = 'An unknown error occurred.';
       if (typeof err === 'object' && err && 'message' in err) {
-        setError((err as { message: string }).message);
-      } else {
-        setError('An unknown error occurred.');
+        const message = (err as { message: string }).message;
+        if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
+          msg = 'Invalid email or password. Please try again.';
+        } else {
+          msg = message;
+        }
       }
+      setError(msg);
     }
     setLoading(false);
   };
@@ -45,6 +54,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
+      if (!auth) throw new Error("Authentication is not available.");
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       await syncUser({
@@ -79,13 +89,18 @@ export default function LoginPage() {
         className="bg-black/60 backdrop-blur-2xl border border-white/10 p-8 rounded-2xl shadow-2xl w-full max-w-md flex flex-col gap-5 animate-fade-in"
       >
         <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">Login to Konoha Shop</h1>
+        {showSignupSuccess && (
+          <div className="text-green-400 text-sm text-center font-semibold bg-green-900/30 rounded py-2 px-3 animate-fade-in mb-2">
+            Signup successful! Please log in to continue.
+          </div>
+        )}
         {error && <div className="text-red-400 text-sm text-center font-semibold bg-red-900/30 rounded py-2 px-3 animate-fade-in">{error}</div>}
         <input
           type="email"
           placeholder="Email"
           className="p-3 rounded-lg bg-[#181c24] text-white border border-[#333] focus:outline-none focus:border-blue-500 transition"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => { setEmail(e.target.value); setShowSignupSuccess(false); }}
           required
         />
         <input
@@ -93,7 +108,7 @@ export default function LoginPage() {
           placeholder="Password"
           className="p-3 rounded-lg bg-[#181c24] text-white border border-[#333] focus:outline-none focus:border-blue-500 transition"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={e => { setPassword(e.target.value); setShowSignupSuccess(false); }}
           required
         />
         <button
