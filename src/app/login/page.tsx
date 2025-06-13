@@ -27,6 +27,9 @@ function LoginPageContent() {
         email: cred.user.email || "",
         name: cred.user.displayName || undefined,
       });
+      if (typeof window !== "undefined") {
+        localStorage.removeItem('mightRange');
+      }
       // Exchange ID token for session cookie
       const idToken = await cred.user.getIdToken();
       await fetch("/api/session/login", {
@@ -62,6 +65,9 @@ function LoginPageContent() {
         email: cred.user.email || "",
         name: cred.user.displayName || undefined,
       });
+      if (typeof window !== "undefined") {
+        localStorage.removeItem('mightRange');
+      }
       // Exchange ID token for session cookie
       const idToken = await cred.user.getIdToken();
       await fetch("/api/session/login", {

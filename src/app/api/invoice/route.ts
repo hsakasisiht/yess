@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
           quantity: item.quantity,
           gemCost: item.gemCost,
           pricePer100k: item.pricePer100k,
+          price: item.price,
         })),
       },
       total,

@@ -127,7 +127,7 @@ export default function CartPage({
         items: items.map(item => ({
           name: item.name,
           quantity: item.quantity,
-          price: item.price,
+          price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
           category: item.category,
           gemCost: item.gemCost,
           pricePer100k: item.pricePer100k,
@@ -140,7 +140,7 @@ export default function CartPage({
           if (item.category === 'GEMS' && item.pricePer100k && item.gemCost) {
             return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
           }
-          return sum + (item.price * item.quantity);
+          return sum + (typeof item.price === 'string' ? parseFloat(item.price) : item.price) * item.quantity;
         }, 0),
         userName: dbUser?.name || 'Customer',
         userEmail: dbUser?.email || '',

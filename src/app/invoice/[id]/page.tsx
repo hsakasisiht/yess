@@ -354,7 +354,7 @@ export default function InvoicePage() {
         <div className="px-2 sm:px-8 py-4 bg-[#18181b] border-t border-[#23232b] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xs text-white/60">To Pay</div>
-            <div className="text-white/90 text-base font-bold">${resourcesSubtotal.toFixed(2)}</div>
+            <div className="text-white/90 text-base font-bold">${invoice?.total?.toFixed(2) || '0.00'}</div>
           </div>
           <div className="flex flex-row gap-2 sm:gap-4 print:hidden mt-2 sm:mt-0 justify-end">
             <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-5 rounded-lg font-semibold text-base shadow transition">

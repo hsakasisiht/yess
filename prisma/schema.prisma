@@ -68,6 +68,7 @@ model OrderItem {
   quantity  Int      @default(1)
   gemCost   Int?
   pricePer100k Float?
+  price     Float?   // locked-in price for this order item
 }
 
 model Cart {

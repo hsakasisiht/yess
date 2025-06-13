@@ -5,36 +5,45 @@ import { useRouter } from "next/navigation";
 
 interface Order {
   id: string;
-  items: { product: { name: string; category: string; price: number }; quantity: number; gemCost?: number; pricePer100k?: number }[];
+  items: {
+    product: { name: string; category: string; price: number };
+    price: number; // locked-in price
+    quantity: number;
+    gemCost?: number;
+    pricePer100k?: number;
+  }[];
   total: number;
   paymentStatus: string;
   status: string;
 }
 
 export default function AccountPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, dbUser } = useAuth();
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (user && user.email) {
-      fetch(`/api/orders?userEmail=${encodeURIComponent(user.email)}`)
+    if ((dbUser && dbUser.firebaseUid) || (user && user.email)) {
+      const queryParam = dbUser && dbUser.firebaseUid
+        ? `firebaseUid=${encodeURIComponent(dbUser.firebaseUid)}`
+        : `userEmail=${encodeURIComponent(user.email)}`;
+      fetch(`/api/orders?${queryParam}`)
         .then(res => res.json())
         .then(data => {
           setOrders(data.orders || []);
           setFetching(false);
         });
     }
-  }, [user, loading, router]);
+  }, [user, dbUser, loading, router]);
 
   function getOrderTotal(order: Order) {
     return order.items.reduce((sum, item) => {
       if (item.product.category === 'GEMS' && item.pricePer100k && item.gemCost) {
         return sum + ((item.gemCost * item.quantity) / 100000) * item.pricePer100k;
       }
-      return sum + (item.product.price * item.quantity);
+      return sum + (item.price * item.quantity);
     }, 0);
   }
 

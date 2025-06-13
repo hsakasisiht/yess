@@ -53,6 +53,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('mightRange');
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider value={{ user, dbUser, loading }}>
       {children}

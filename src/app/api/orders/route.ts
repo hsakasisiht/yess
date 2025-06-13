@@ -29,16 +29,19 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userEmail = searchParams.get('userEmail');
-  if (!userEmail) {
-    return NextResponse.json({ error: 'Missing userEmail' }, { status: 400 });
+  const firebaseUid = searchParams.get('firebaseUid');
+  let user = null;
+  if (firebaseUid) {
+    user = await prisma.user.findUnique({ where: { firebaseUid } });
+  } else if (userEmail) {
+    user = await prisma.user.findUnique({ where: { email: userEmail } });
   }
-  const user = await prisma.user.findUnique({ where: { email: userEmail } });
   if (!user) {
     return NextResponse.json({ orders: [] });
   }
   const userOrders = await prisma.order.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
     include: {
       items: {
         include: {
@@ -46,6 +49,6 @@ export async function GET(req: NextRequest) {
         }
       }
     }
-    });
+  });
   return NextResponse.json({ orders: userOrders });
 } 

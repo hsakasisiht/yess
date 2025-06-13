@@ -28,6 +28,9 @@ export default function SignupPage() {
         email: cred.user.email || "",
         name: name || cred.user.displayName || undefined,
       });
+      if (typeof window !== "undefined") {
+        localStorage.removeItem('mightRange');
+      }
       // Sign out the user after signup
       await auth.signOut();
       // Redirect to login with a query param to show a message
