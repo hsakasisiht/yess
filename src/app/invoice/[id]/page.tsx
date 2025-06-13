@@ -127,11 +127,14 @@ export default function InvoicePage() {
     const doc = new jsPDF();
 
     // Header
+    const logoImg = new Image();
+    logoImg.src = '/1.png'; // Make sure this path is correct and accessible
+    await new Promise(resolve => { logoImg.onload = resolve; });
+    doc.addImage(logoImg, 'PNG', 14, 8, 40, 16); // x, y, width, height
     doc.setFontSize(18);
-    doc.text(COMPANY_NAME, 14, 18);
     doc.setFontSize(12);
     doc.setTextColor('#FFA500');
-    doc.text('UNPAID', 180, 18, { align: 'right' });
+    doc.text(invoice?.status || 'UNPAID', 180, 18, { align: 'right' });
     doc.setTextColor('#000000');
     doc.setFontSize(10);
     doc.text(`Invoice #: ${id ?? ''}`, 14, 28);
@@ -148,17 +151,19 @@ export default function InvoicePage() {
     doc.text(COMPANY_CONTACT, 110, 56);
     // Table
     const tableColumn = ['Description', 'Amount'];
-    const tableRows = invoice.items.map((item: any, idx: number) => [
+    const tableRows = invoice.items.map((item: any) => [
       `${item.name} x${item.quantity}`,
-      `${item.category === 'GEMS' && item.pricePer100k && item.gemCost ? (
-        <>${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}</>
-      ) : (
-        <>${(item.price * item.quantity).toFixed(2)}</>
-      )}`
+      item.category === 'GEMS' && item.pricePer100k && item.gemCost
+        ? `$${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}`
+        : `$${(item.price * item.quantity).toFixed(2)}`
     ]);
-    // Add subtotal and total rows
+    // Add subtotal rows
     tableRows.push([
-      { content: 'Subtotal', styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: 'Sub Total (Gems)', styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: `$${gemsSubtotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+    ]);
+    tableRows.push([
+      { content: 'Sub Total (Resources)', styles: { halign: 'right', fontStyle: 'bold' } },
       { content: `$${resourcesSubtotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
     ]);
     tableRows.push([
@@ -247,7 +252,7 @@ export default function InvoicePage() {
           </div>
           {/* Pay To */}
           <div className="flex-1 min-w-0 sm:text-right">
-            <div className="font-bold text-white/90 mb-1">Payimage.png To</div>
+            <div className="font-bold text-white/90 mb-1">Pay To</div>
             <div className="text-white/80 text-sm mb-1">{COMPANY_NAME}</div>
             <div className="text-white/60 text-xs mb-1">{COMPANY_CONTACT}</div>
           </div>
