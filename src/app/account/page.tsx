@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useCurrency } from '../../context/CurrencyContext';
 
 interface Order {
   id: string;
@@ -22,6 +23,7 @@ export default function AccountPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [fetching, setFetching] = useState(true);
+  const { currency, convert, currencySymbol } = useCurrency();
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
@@ -92,7 +94,7 @@ export default function AccountPage() {
                 <div className="flex flex-col gap-1 mb-2">
                   <div className="flex items-center gap-2 text-base text-white/90 font-semibold">
                     <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 8v8" /></svg>
-                      ${getOrderTotal(order).toFixed(2)}
+                    {currencySymbol}{convert(getOrderTotal(order)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </div>
                   <div className="text-sm text-white/70 mt-1">
                     {order.items.length === 1 ? order.items[0].product.name : `${order.items.length} items`}

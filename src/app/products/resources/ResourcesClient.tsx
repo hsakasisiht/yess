@@ -5,6 +5,7 @@ import CartModal from '../../../components/CartModal';
 import Image from 'next/image';
 import { useAuth } from '../../../context/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
+import { useCurrency } from '../../../context/CurrencyContext';
 
 function KingdomModal({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (kingdom: string) => void }) {
   const [kingdom, setKingdom] = useState('');
@@ -43,6 +44,7 @@ export default function ResourcesClient() {
   const totalResources = cart.filter(i => i.category === 'RESOURCES').reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [kingdomModalOpen, setKingdomModalOpen] = useState(false);
   const [kingdomNumber, setKingdomNumber] = useState<string | null>(null);
+  const { currency, convert, currencySymbol } = useCurrency();
 
   // Fetch resources on mount
   useEffect(() => {
@@ -82,36 +84,36 @@ export default function ResourcesClient() {
     // Price tables
     const priceTable: { [range: string]: { [code: string]: number } } = {
       '1-1685': {
-        '44444': 3.5,
-        '44440': 2.5,
+        '44444': 3,
+        '44440': 2.2,
         '22222': 2.3,
-        '22220': 1.7,
-        '11111': 1.8,
-        '11110': 1.5,
+        '22220': 1.5,
+        '11111': 1.5,
+        '11110': 1.2,
       },
       '1686-1739': {
         '44444': 4,
-        '44440': 2.8,
-        '22222': 2.7,
+        '44440': 2.5,
+        '22222': 2.4,
         '22220': 2,
-        '11111': 2.2,
-        '11110': 1.8,
+        '11111': 2,
+        '11110': 1.5,
       },
       '1740-1769': {
         '44444': 5,
-        '44440': 3.7,
-        '22222': 3.2,
-        '22220': 2.5,
+        '44440': 3.5,
+        '22222': 3,
+        '22220': 2.4,
         '11111': 2.5,
-        '11110': 2.2,
+        '11110': 2,
       },
       '1770-1780': {
         '44444': 6,
         '44440': 4.4,
-        '22222': 3.7,
-        '22220': 2.8,
-        '11111': 2.7,
-        '11110': 2.3,
+        '22222': 3.5,
+        '22220': 2.4,
+        '11111': 2.5,
+        '11110': 2,
       },
     };
     let range: string | null = null;
@@ -189,7 +191,7 @@ export default function ResourcesClient() {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
             </span>
             <span>Resources Cart</span>
-            <span className="cart-badge">${resourcesCartTotal.toFixed(2)}</span>
+            <span className="cart-badge">{currencySymbol}{convert(resourcesCartTotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
         </div>
         {/* Desktop: keep previous layout */}
@@ -206,7 +208,7 @@ export default function ResourcesClient() {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L10 13.27l-4.77 2.51.91-5.32-3.87-3.77 5.34-.78z"/></svg>
             </span>
             <span>Resources Cart</span>
-            <span className="cart-badge">${resourcesCartTotal.toFixed(2)}</span>
+            <span className="cart-badge">{currencySymbol}{convert(resourcesCartTotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
         </div>
       </div>
@@ -232,7 +234,7 @@ export default function ResourcesClient() {
               {resource.description || descriptionMap[resource.name] || ''}
             </div>
             <div className="text-green-400 font-bold text-sm sm:text-xs md:text-sm">
-              ${getResourcePrice(resource.name, kingdomNumber) ?? resource.price}
+              {currencySymbol}{convert(getResourcePrice(resource.name, kingdomNumber) ?? resource.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </div>
             <button
               className="mt-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-base sm:text-xs md:text-sm transition w-full"

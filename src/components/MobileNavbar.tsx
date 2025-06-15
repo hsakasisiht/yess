@@ -8,6 +8,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import Image from 'next/image';
+import { useCurrency } from '../context/CurrencyContext';
 
 const navLinks = [
   { name: "Gems", href: "/products/gems", icon: "gems" },
@@ -21,6 +22,8 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
   const { user } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { currency, setCurrency, currencySymbol } = useCurrency();
+  const [currencyOpen, setCurrencyOpen] = useState(false);
 
   return (
     <>
@@ -94,6 +97,33 @@ export default function MobileNavbar({ pageName }: { pageName: string }) {
               {/* My Orders and Logout at Bottom */}
               {user && (
                 <div className="mt-auto mb-8 flex flex-col gap-4 w-full px-4">
+                  {/* Currency Switcher */}
+                  <div className="relative">
+                    <button
+                      className="flex items-center gap-1 px-2 py-1 bg-[#23232b] hover:bg-[#222] text-white rounded transition text-sm font-semibold border border-white/10 w-full justify-center"
+                      onClick={() => setCurrencyOpen((v) => !v)}
+                      onBlur={() => setTimeout(() => setCurrencyOpen(false), 150)}
+                    >
+                      {currencySymbol} {currency}
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    {currencyOpen && (
+                      <div className="absolute left-0 bottom-full mb-2 bg-[#23232b] border border-white/10 rounded shadow-lg z-10">
+                        <button
+                          className={`block w-full text-left px-3 py-2 hover:bg-[#222] ${currency === 'USD' ? 'text-blue-400 font-bold' : 'text-white'}`}
+                          onClick={() => { setCurrency('USD'); setCurrencyOpen(false); }}
+                        >
+                          $ USD
+                        </button>
+                        <button
+                          className={`block w-full text-left px-3 py-2 hover:bg-[#222] ${currency === 'INR' ? 'text-blue-400 font-bold' : 'text-white'}`}
+                          onClick={() => { setCurrency('INR'); setCurrencyOpen(false); }}
+                        >
+                          ₹ INR
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <Link
                     href="/account"
                     className="w-full flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-base shadow transition-all justify-center"

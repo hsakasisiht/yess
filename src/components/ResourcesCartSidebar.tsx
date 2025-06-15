@@ -3,15 +3,45 @@ import React from "react";
 import { useCart } from '../context/CartContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function ResourcesCartSidebar() {
   const { cart, updateQuantity, removeFromCart, loading } = useCart();
   const router = useRouter();
   const resources = cart.filter(i => i.category === 'RESOURCES');
   const subtotal = resources.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const { currency, setCurrency, currencySymbol, convert } = useCurrency();
+  const [currencyOpen, setCurrencyOpen] = React.useState(false);
 
   return (
     <aside className="bg-[#171717] rounded-lg shadow-xl p-4 w-full max-w-xs sticky top-6 self-start flex flex-col gap-4">
+      {/* Currency Switcher */}
+      <div className="relative mb-2">
+        <button
+          className="flex items-center gap-1 px-2 py-1 bg-[#23232b] hover:bg-[#222] text-white rounded transition text-sm font-semibold border border-white/10"
+          onClick={() => setCurrencyOpen((v) => !v)}
+          onBlur={() => setTimeout(() => setCurrencyOpen(false), 150)}
+        >
+          {currencySymbol} {currency}
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {currencyOpen && (
+          <div className="absolute left-0 mt-1 w-24 bg-[#23232b] border border-white/10 rounded shadow-lg z-10">
+            <button
+              className={`block w-full text-left px-3 py-2 hover:bg-[#222] ${currency === 'USD' ? 'text-blue-400 font-bold' : 'text-white'}`}
+              onClick={() => { setCurrency('USD'); setCurrencyOpen(false); }}
+            >
+              $ USD
+            </button>
+            <button
+              className={`block w-full text-left px-3 py-2 hover:bg-[#222] ${currency === 'INR' ? 'text-blue-400 font-bold' : 'text-white'}`}
+              onClick={() => { setCurrency('INR'); setCurrencyOpen(false); }}
+            >
+              ₹ INR
+            </button>
+          </div>
+        )}
+      </div>
       <h2 className="text-xl font-bold text-white mb-2">Resources Cart</h2>
       {loading ? (
         <div className="flex justify-center items-center py-8"><span className="loader" /></div>
@@ -24,7 +54,7 @@ export default function ResourcesCartSidebar() {
               {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={40} height={40} className="w-10 h-10 object-contain rounded" />}
               <div className="flex-1">
                 <div className="font-semibold text-white text-sm truncate">{item.name}</div>
-                <div className="text-blue-400 text-xs">${Number(item.price).toFixed(2)}</div>
+                <div className="text-blue-400 text-xs">{currencySymbol}{convert(Number(item.price)).toFixed(2)}</div>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={async () => await updateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 bg-[#333] text-white rounded" disabled={loading || item.quantity <= 1}>-</button>
@@ -50,7 +80,7 @@ export default function ResourcesCartSidebar() {
               </button>
             </div>
           ))}
-          <div className="text-right text-lg font-bold text-blue-400 mt-2">Subtotal: ${subtotal.toFixed(2)}</div>
+          <div className="text-right text-lg font-bold text-blue-400 mt-2">Subtotal: {currencySymbol}{convert(subtotal).toFixed(2)}</div>
           <button
             className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-lg transition-transform hover:scale-105 shadow-lg"
             onClick={() => router.push('/cart/checkout')}

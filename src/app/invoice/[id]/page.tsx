@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
+import { useCurrency } from '../../../context/CurrencyContext';
 
 const COMPANY_NAME = 'KONOHA BAZAR';
 const COMPANY_CONTACT = '+91 7599318577';
@@ -37,36 +38,36 @@ function getResourcePrice(resourceName: string, kingdomNumber: string | null): n
   if (!code) return null;
   const priceTable: { [range: string]: { [code: string]: number } } = {
     '1-1685': {
-      '44444': 3.5,
-      '44440': 2.5,
+      '44444': 3,
+      '44440': 2.2,
       '22222': 2.3,
-      '22220': 1.7,
-      '11111': 1.8,
-      '11110': 1.5,
+      '22220': 1.5,
+      '11111': 1.5,
+      '11110': 1.2,
     },
     '1686-1739': {
       '44444': 4,
-      '44440': 2.8,
-      '22222': 2.7,
+      '44440': 2.5,
+      '22222': 2.4,
       '22220': 2,
-      '11111': 2.2,
-      '11110': 1.8,
+      '11111': 2,
+      '11110': 1.5,
     },
     '1740-1769': {
       '44444': 5,
-      '44440': 3.7,
-      '22222': 3.2,
-      '22220': 2.5,
+      '44440': 3.5,
+      '22222': 3,
+      '22220': 2.4,
       '11111': 2.5,
-      '11110': 2.2,
+      '11110': 2,
     },
     '1770-1780': {
       '44444': 6,
       '44440': 4.4,
-      '22222': 3.7,
-      '22220': 2.8,
-      '11111': 2.7,
-      '11110': 2.3,
+      '22222': 3.5,
+      '22220': 2.4,
+      '11111': 2.5,
+      '11110': 2,
     },
   };
   let range: string | null = null;
@@ -89,6 +90,7 @@ export default function InvoicePage() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [manualCopyLink, setManualCopyLink] = useState<string | null>(null);
   const [kingdomNumber, setKingdomNumber] = useState<string | null>(null);
+  const { currency, convert, currencySymbol } = useCurrency();
 
   useEffect(() => {
     if (!id) return;
@@ -154,21 +156,21 @@ export default function InvoicePage() {
     const tableRows = invoice.items.map((item: any) => [
       `${item.name} x${item.quantity}`,
       item.category === 'GEMS' && item.pricePer100k && item.gemCost
-        ? `$${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}`
-        : `$${(item.price * item.quantity).toFixed(2)}`
+        ? `${currencySymbol}${convert(getItemTotal(item)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+        : `${currencySymbol}${convert(item.price * item.quantity).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
     ]);
     // Add subtotal rows
     tableRows.push([
       { content: 'Sub Total (Gems)', styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: `$${gemsSubtotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+      { content: `${currencySymbol}${convert(gemsSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, styles: { fontStyle: 'bold', halign: 'right' } }
     ]);
     tableRows.push([
       { content: 'Sub Total (Resources)', styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: `$${resourcesSubtotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+      { content: `${currencySymbol}${convert(resourcesSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, styles: { fontStyle: 'bold', halign: 'right' } }
     ]);
     tableRows.push([
       { content: 'Total', styles: { halign: 'right', fontStyle: 'bold' } },
-      { content: `$${invoice?.total?.toFixed(2) || '0.00'}`, styles: { fontStyle: 'bold', halign: 'right' } }
+      { content: `${currencySymbol}${convert(invoice?.total).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, styles: { fontStyle: 'bold', halign: 'right' } }
     ]);
     // Draw table
     autoTable(doc, {
@@ -307,9 +309,9 @@ export default function InvoicePage() {
                     <div className="font-bold">x{item.quantity}</div>
                     <div className="text-xs text-white/70 mt-1">
                       {item.category === 'GEMS' && item.pricePer100k && item.gemCost ? (
-                        <>${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)}</>
+                        <>{currencySymbol}{convert(getItemTotal(item)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</>
                       ) : (
-                        <>${(item.price * item.quantity).toFixed(2)}</>
+                        <>{currencySymbol}{convert(item.price * item.quantity).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</>
                       )}
                     </div>
                   </td>
@@ -319,34 +321,34 @@ export default function InvoicePage() {
             <tfoot className="bg-[#23232b]">
               <tr>
                 <td className="px-4 py-2 text-right font-bold text-white/80">Sub Total (Gems)</td>
-                <td className="px-4 py-2 text-right font-bold text-white/90">${gemsSubtotal.toFixed(2)}</td>
+                <td className="px-4 py-2 text-right font-bold text-white/90">{currencySymbol}{convert(gemsSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
               </tr>
               <tr>
                 <td className="px-4 py-2 text-right font-bold text-white/80">Sub Total (Resources)</td>
-                <td className="px-4 py-2 text-right font-bold text-white/90">${resourcesSubtotal.toFixed(2)}</td>
+                <td className="px-4 py-2 text-right font-bold text-white/90">{currencySymbol}{convert(resourcesSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
               </tr>
               {/* Example: taxes/credit, only show if present in data */}
               {invoice.cgst && (
                 <tr>
                   <td className="px-4 py-2 text-right font-bold text-white/80">9.00% CGST</td>
-                  <td className="px-4 py-2 text-right text-white/90">${invoice.cgst.toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right text-white/90">{currencySymbol}{convert(invoice.cgst).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 </tr>
               )}
               {invoice.sgst && (
                 <tr>
                   <td className="px-4 py-2 text-right font-bold text-white/80">9.00% SGST</td>
-                  <td className="px-4 py-2 text-right text-white/90">${invoice.sgst.toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right text-white/90">{currencySymbol}{convert(invoice.sgst).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 </tr>
               )}
               {invoice.credit && (
                 <tr>
                   <td className="px-4 py-2 text-right font-bold text-white/80">Credit</td>
-                  <td className="px-4 py-2 text-right text-white/90">${invoice.credit.toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right text-white/90">{currencySymbol}{convert(invoice.credit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 </tr>
               )}
               <tr>
                 <td className="px-4 py-2 text-right font-bold text-white">Total</td>
-                <td className="px-4 py-2 text-right font-bold text-white">${invoice?.total?.toFixed(2) || '0.00'}</td>
+                <td className="px-4 py-2 text-right font-bold text-white">{currencySymbol}{convert(invoice?.total).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
               </tr>
             </tfoot>
           </table>
@@ -359,7 +361,7 @@ export default function InvoicePage() {
         <div className="px-2 sm:px-8 py-4 bg-[#18181b] border-t border-[#23232b] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xs text-white/60">To Pay</div>
-            <div className="text-white/90 text-base font-bold">${invoice?.total?.toFixed(2) || '0.00'}</div>
+            <div className="text-white/90 text-base font-bold">{currencySymbol}{convert(invoice?.total).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
           </div>
           <div className="flex flex-row gap-2 sm:gap-4 print:hidden mt-2 sm:mt-0 justify-end">
             <button onClick={handleDownloadPDF} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-5 rounded-lg font-semibold text-base shadow transition">

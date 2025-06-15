@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useCart } from '../context/CartContext';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useCurrency } from '../context/CurrencyContext';
 
 function getNumber(val: unknown): number {
   if (typeof val === 'number') return val;
@@ -29,36 +30,36 @@ function getResourcePrice(resourceName: string, kingdomNumber: string | null): n
   if (!code) return null;
   const priceTable: { [range: string]: { [code: string]: number } } = {
     '1-1685': {
-      '44444': 3.5,
-      '44440': 2.5,
+      '44444': 3,
+      '44440': 2.2,
       '22222': 2.3,
-      '22220': 1.7,
-      '11111': 1.8,
-      '11110': 1.5,
+      '22220': 1.5,
+      '11111': 1.5,
+      '11110': 1.2,
     },
     '1686-1739': {
       '44444': 4,
-      '44440': 2.8,
-      '22222': 2.7,
+      '44440': 2.5,
+      '22222': 2.4,
       '22220': 2,
-      '11111': 2.2,
-      '11110': 1.8,
+      '11111': 2,
+      '11110': 1.5,
     },
     '1740-1769': {
       '44444': 5,
-      '44440': 3.7,
-      '22222': 3.2,
-      '22220': 2.5,
+      '44440': 3.5,
+      '22222': 3,
+      '22220': 2.4,
       '11111': 2.5,
-      '11110': 2.2,
+      '11110': 2,
     },
     '1770-1780': {
       '44444': 6,
       '44440': 4.4,
-      '22222': 3.7,
-      '22220': 2.8,
-      '11111': 2.7,
-      '11110': 2.3,
+      '22222': 3.5,
+      '22220': 2.4,
+      '11111': 2.5,
+      '11110': 2,
     },
   };
   let range: string | null = null;
@@ -72,6 +73,7 @@ function getResourcePrice(resourceName: string, kingdomNumber: string | null): n
 
 export default function CartModal({ open, onClose, category }: { open: boolean; onClose: () => void; category?: string }) {
   const { cart, updateQuantity, removeFromCart, loading, refetch } = useCart();
+  const { currency, convert, currencySymbol } = useCurrency();
   console.log('CartModal cart:', cart);
   const items = category ? cart.filter(i => i.category === category) : cart;
   const total = items.reduce((sum, item) => sum + ((getNumber(item.gemCost) || getNumber(item.price)) * item.quantity), 0);
@@ -120,7 +122,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
     const gemCost = getNumber(i.gemCost);
     const pricePer100k = getNumber(i.pricePer100k);
     if (i.category === 'GEMS' && pricePer100k && gemCost && i.quantity) {
-      return `$${(((gemCost * i.quantity) / 100000) * pricePer100k).toFixed(2)}`;
+      return `${currencySymbol}${convert(((gemCost * i.quantity) / 100000) * pricePer100k).toFixed(2)}`;
     }
     return null;
   };
@@ -163,7 +165,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                       <div className="text-blue-400 text-sm">
                         {item.gemCost * item.quantity} Gems
                         {item.pricePer100k && item.gemCost && (
-                          <> (${((item.gemCost * item.quantity) / 100000 * item.pricePer100k).toFixed(2)})</>
+                          <> ({getGemsDollarPrice(item)})</>
                         )}
                         {item.mightRangeLabel && (
                           <span className="ml-2 text-xs text-green-400">
@@ -230,7 +232,7 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
                           </>
                         ) : (
                           <>
-                            ${item.price}
+                            {currencySymbol}{convert(item.price).toFixed(2)}
                             {item.kingdomNumber && (
                               <span className="ml-1 text-xs text-green-400">(Kingdom {item.kingdomNumber})</span>
                             )}
@@ -278,8 +280,8 @@ export default function CartModal({ open, onClose, category }: { open: boolean; 
           <div className="mt-4">
             <div className="text-right text-lg font-bold text-blue-400 mb-2">
               Total: {category === 'GEMS' || items.some(i => i.category === 'GEMS')
-                ? `$${gemsTotal.toFixed(2)} (${items.reduce((sum, i) => sum + getNumber(i.gemCost) * i.quantity, 0)} Gems)`
-                : `$${resourcesTotal.toFixed(2)}`}
+                ? `${currencySymbol}${convert(gemsTotal).toFixed(2)} (${items.reduce((sum, i) => sum + getNumber(i.gemCost) * i.quantity, 0)} Gems)`
+                : `${currencySymbol}${convert(resourcesTotal).toFixed(2)}`}
             </div>
             <button
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-lg transition-transform hover:scale-105 shadow-lg"

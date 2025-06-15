@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function CartPage({
   title,
@@ -27,6 +28,7 @@ export default function CartPage({
   const isCheckout = showSummary;
   const gemsBelowMin = isCheckout && totalGems > 0 && totalGems < 100000;
   const { dbUser } = useAuth();
+  const { currency, convert, currencySymbol } = useCurrency();
 
   // Calculate subtotal for gems using locked-in pricePer100k and gemCost
   const gemsSubtotal = items
@@ -50,7 +52,7 @@ export default function CartPage({
     if (!item || typeof item !== 'object') return null;
     const i = item as { gemCost?: number; pricePer100k?: number; category?: string; quantity?: number };
     if (i.category === 'GEMS' && i.pricePer100k && i.gemCost && i.quantity) {
-      return `$${(((i.gemCost * i.quantity) / 100000) * i.pricePer100k).toFixed(2)}`;
+      return `${currencySymbol}${convert(((i.gemCost * i.quantity) / 100000) * i.pricePer100k).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
     return null;
   };
@@ -135,6 +137,7 @@ export default function CartPage({
           mightRangeLabel: item.mightRangeLabel,
           productId: item.productId,
           kingdomNumber: item.kingdomNumber,
+          imageUrl: item.imageUrl,
         })),
         total: items.reduce((sum, item) => {
           if (item.category === 'GEMS' && item.pricePer100k && item.gemCost) {
@@ -203,7 +206,7 @@ export default function CartPage({
                     {item.category === 'GEMS' && (
                       <div className="text-blue-400 text-xs mt-1">
                         Gems: {(item.gemCost || 0) * item.quantity} {item.pricePer100k && item.gemCost && (
-                          <>(${(((item.gemCost * item.quantity) / 100000) * item.pricePer100k).toFixed(2)})</>
+                          <>({getGemsDollarPrice(item)})</>
                         )}
                         {item.mightRangeLabel && (
                           <span className="ml-2 text-xs text-green-400">
@@ -214,7 +217,7 @@ export default function CartPage({
                     )}
                     {item.category === 'RESOURCES' && (
                       <div className="text-green-400 text-xs mt-1">
-                        ${item.price}
+                        {getResourcePriceForItem(item)}
                         {item.kingdomNumber && (
                           <span className="ml-1 text-xs text-green-400">(Kingdom {item.kingdomNumber})</span>
                         )}
@@ -257,9 +260,9 @@ export default function CartPage({
               <div className="text-gray-400 text-center py-4">Your cart is empty.</div>
             ) : (
               <div className="flex flex-col gap-2 text-white text-base">
-                  <div className="flex justify-between"><span>Gems:</span><span>${gemsSubtotal.toFixed(2)} ({cart.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0)} Gems)</span></div>
-                  <div className="flex justify-between"><span>Resources:</span><span>${resourcesSubtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between font-bold text-blue-400 mt-2 text-lg border-t border-white/10 pt-2"><span>Total:</span><span>${(gemsSubtotal + resourcesSubtotal).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Gems:</span><span>{currencySymbol}{convert(gemsSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ({cart.filter(i => i.category === 'GEMS').reduce((sum, i) => sum + (i.gemCost || 0) * i.quantity, 0)} Gems)</span></div>
+                  <div className="flex justify-between"><span>Resources:</span><span>{currencySymbol}{convert(resourcesSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+                <div className="flex justify-between font-bold text-blue-400 mt-2 text-lg border-t border-white/10 pt-2"><span>Total:</span><span>{currencySymbol}{convert(gemsSubtotal + resourcesSubtotal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
               </div>
               )}
             {showPlaceOrder && (

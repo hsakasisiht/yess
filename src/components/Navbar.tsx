@@ -6,6 +6,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { UserIcon, HomeIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Image from 'next/image';
+import { useCurrency } from '../context/CurrencyContext';
 
 const productCategories = [
   { name: "Gems", href: "/products/gems", icon: "/gems.png" },
@@ -16,6 +17,8 @@ export default function Navbar() {
   const { user } = useAuth();
   const [prodOpen, setProdOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { currency, setCurrency, currencySymbol } = useCurrency();
+  const [currencyOpen, setCurrencyOpen] = useState(false);
 
   return (
     <nav className="bg-[#171717] border-b border-[#222] px-4 py-2 flex items-center justify-between sticky top-0 z-50 shadow-lg animate-fade-in">
@@ -54,6 +57,33 @@ export default function Navbar() {
         <Link href="/social" className="text-white hover:text-blue-400 font-semibold px-3 py-2 rounded transition">Social</Link>
       </div>
       <div className="flex items-center gap-2">
+        <div className="relative">
+          <button
+            className="flex items-center gap-1 px-2 py-1 bg-[#23232b] hover:bg-[#222] text-white rounded transition text-sm font-semibold border border-white/10"
+            onClick={() => setCurrencyOpen((v) => !v)}
+            onBlur={() => setTimeout(() => setCurrencyOpen(false), 200)}
+            title="Change currency"
+          >
+            {currency === 'USD' ? '$ USD' : '₹ INR'}
+            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {currencyOpen && (
+            <div className="absolute left-0 mt-2 w-28 bg-black/80 border border-blue-900/40 backdrop-blur-xl rounded-xl shadow-xl py-1 animate-fade-in-up z-50">
+              <button
+                className={`w-full text-left px-4 py-2 text-white hover:bg-blue-900/30 rounded-xl transition font-semibold text-sm ${currency === 'USD' ? 'bg-blue-900/20' : ''}`}
+                onClick={() => { setCurrency('USD'); setCurrencyOpen(false); }}
+              >
+                $ USD
+              </button>
+              <button
+                className={`w-full text-left px-4 py-2 text-white hover:bg-blue-900/30 rounded-xl transition font-semibold text-sm ${currency === 'INR' ? 'bg-blue-900/20' : ''}`}
+                onClick={() => { setCurrency('INR'); setCurrencyOpen(false); }}
+              >
+                ₹ INR
+              </button>
+            </div>
+          )}
+        </div>
         <Link href="/cart/checkout" className="flex items-center justify-center bg-transparent hover:bg-[#222] text-white p-2 rounded transition">
           <ShoppingCartIcon className="h-6 w-6" />
         </Link>

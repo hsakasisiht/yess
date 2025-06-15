@@ -16,6 +16,15 @@ interface MightRange {
   price: number;
 }
 
+// Updated might range prices
+const MIGHT_RANGE_PRICES: MightRange[] = [
+  { key: '0-399', label: '0-399m', price: 4.3 },
+  { key: '400-799', label: '400m - 799m', price: 4.45 },
+  { key: '800-1099', label: '800m - 1099m', price: 4.6 },
+  { key: '1100-1399', label: '1100m - 1399m', price: 4.75 },
+  { key: '1400-2500', label: '1400m - 2500m', price: 4.9 },
+];
+
 export default function GemsClient() {
   const [gems, setGems] = useState<Array<{
     id: string;
