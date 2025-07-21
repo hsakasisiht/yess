@@ -77,52 +77,52 @@ export default function ResourcesClient() {
       'HALF BANK (2B EACH TYPE)': '22222',
       'HALF BANK (2B EACH BUT NO GOLD)': '22220',
       '11111 (1B EACH TYPE RESOURCES)': '11111',
-      '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
+      '4B FOOD ONLY': '40000',
     };
     const code = codeMap[resourceName.toUpperCase()];
     if (!code) return null;
     // Price tables
-    const priceTable: { [range: string]: { [code: string]: number } } = {
-      '1-1685': {
-        '44444': 3,
-        '44440': 2.2,
-        '22222': 2.3,
-        '22220': 1.5,
-        '11111': 1.5,
-        '11110': 1.2,
-      },
-      '1686-1739': {
-        '44444': 4,
+    const priceTable: { [range: string]: { [code: string]: number | null } } = {
+      '1-1665': {
+        '44444': 3.2,
         '44440': 2.5,
-        '22222': 2.4,
-        '22220': 2,
+        '22222': 2,
+        '22220': 1.7,
+        '11111': 1.7,
+        '40000': 1.4,
+      },
+      '1666-1712': {
+        '44444': 3.5,
+        '44440': 2.8,
+        '22222': null,
+        '22220': null,
         '11111': 2,
-        '11110': 1.5,
+        '40000': null,
       },
-      '1740-1769': {
-        '44444': 5,
-        '44440': 3.5,
-        '22222': 3,
-        '22220': 2.4,
-        '11111': 2.5,
-        '11110': 2,
+      '1713-1732': {
+        '44444': 3.9,
+        '44440': 3.4,
+        '22222': null,
+        '22220': null,
+        '11111': 2.15,
+        '40000': null,
       },
-      '1770-1780': {
-        '44444': 6,
-        '44440': 4.4,
-        '22222': 3.5,
-        '22220': 2.4,
-        '11111': 2.5,
-        '11110': 2,
+      '1733-1755': {
+        '44444': 4.1,
+        '44440': 3.6,
+        '22222': null,
+        '22220': null,
+        '11111': 2.3,
+        '40000': null,
       },
     };
     let range: string | null = null;
-    if (k >= 1 && k <= 1685) range = '1-1685';
-    else if (k >= 1686 && k <= 1739) range = '1686-1739';
-    else if (k >= 1740 && k <= 1769) range = '1740-1769';
-    else if (k >= 1770 && k <= 1780) range = '1770-1780';
+    if (k >= 1 && k <= 1665) range = '1-1665';
+    else if (k >= 1666 && k <= 1712) range = '1666-1712';
+    else if (k >= 1713 && k <= 1732) range = '1713-1732';
+    else if (k >= 1733 && k <= 1755) range = '1733-1755';
     if (!range) return null;
-    return priceTable[range][code] || null;
+    return priceTable[range][code] ?? null;
   }
 
   // Calculate total resources price using locked-in cart item price
@@ -214,36 +214,44 @@ export default function ResourcesClient() {
       </div>
       {/* Grid: 2 col on mobile, 3+ on md+ */}
       <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
-        {resources.map((resource: any) => (
-          <div
-            key={resource.id}
-            className="bg-black/40 rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 gap-2 hover:bg-black/60 transition-transform hover:scale-105 backdrop-blur-md text-white"
-          >
-            {resource.imageUrl && (
-              <Image
-                src={resource.imageUrl}
-                alt={resource.name}
-                width={64}
-                height={64}
-                className="w-14 h-14 sm:w-16 sm:h-16 object-contain mb-1"
-              />
-            )}
-            <div className="text-sm sm:text-xs md:text-sm font-semibold text-center truncate w-full">{resource.name}</div>
-            {/* Description below name */}
-            <div className="text-xs text-gray-300 text-center w-full min-h-[18px]">
-              {resource.description || descriptionMap[resource.name] || ''}
-            </div>
-            <div className="text-green-400 font-bold text-sm sm:text-xs md:text-sm">
-              {currencySymbol}{convert(getResourcePrice(resource.name, kingdomNumber) ?? resource.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </div>
-            <button
-              className="mt-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-base sm:text-xs md:text-sm transition w-full"
-              onClick={() => handleAddToCart(resource)}
+        {resources.map((resource: any) => {
+          const price = getResourcePrice(resource.name, kingdomNumber);
+          const unavailable = price === null;
+          return (
+            <div
+              key={resource.id}
+              className="bg-black/40 rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 md:p-5 gap-2 hover:bg-black/60 transition-transform hover:scale-105 backdrop-blur-md text-white opacity-100"
+              style={unavailable ? { opacity: 0.5, pointerEvents: 'none' } : {}}
             >
-              Add
-            </button>
-          </div>
-        ))}
+              {resource.imageUrl && (
+                <Image
+                  src={resource.imageUrl}
+                  alt={resource.name}
+                  width={64}
+                  height={64}
+                  className="w-14 h-14 sm:w-16 sm:h-16 object-contain mb-1"
+                />
+              )}
+              <div className="text-sm sm:text-xs md:text-sm font-semibold text-center truncate w-full">{resource.name}</div>
+              {/* Description below name */}
+              <div className="text-xs text-gray-300 text-center w-full min-h-[18px]">
+                {resource.description || descriptionMap[resource.name] || ''}
+              </div>
+              <div className="text-green-400 font-bold text-sm sm:text-xs md:text-sm">
+                {unavailable
+                  ? <span className="text-red-400">Not available for your kingdom</span>
+                  : `${currencySymbol}${convert(price ?? resource.price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+              </div>
+              <button
+                className="mt-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-base sm:text-xs md:text-sm transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => handleAddToCart(resource)}
+                disabled={unavailable}
+              >
+                Add
+              </button>
+            </div>
+          );
+        })}
       </div>
       <CartModal open={cartOpen} onClose={() => setCartOpen(false)} category="RESOURCES" />
     </div>

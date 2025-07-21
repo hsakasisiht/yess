@@ -32,51 +32,51 @@ function getResourcePrice(resourceName: string, kingdomNumber: string | null): n
     'HALF BANK (2B EACH TYPE)': '22222',
     'HALF BANK (2B EACH BUT NO GOLD)': '22220',
     '11111 (1B EACH TYPE RESOURCES)': '11111',
-    '11110 (1B EACH TYPE BUT NO GOLD)': '11110',
+    '4B FOOD ONLY': '40000',
   };
   const code = codeMap[resourceName];
   if (!code) return null;
-  const priceTable: { [range: string]: { [code: string]: number } } = {
-    '1-1685': {
-      '44444': 3,
-      '44440': 2.2,
-      '22222': 2.3,
-      '22220': 1.5,
-      '11111': 1.5,
-      '11110': 1.2,
-    },
-    '1686-1739': {
-      '44444': 4,
+  const priceTable: { [range: string]: { [code: string]: number | null } } = {
+    '1-1665': {
+      '44444': 3.2,
       '44440': 2.5,
-      '22222': 2.4,
-      '22220': 2,
+      '22222': 2,
+      '22220': 1.7,
+      '11111': 1.7,
+      '40000': 1.4,
+    },
+    '1666-1712': {
+      '44444': 3.5,
+      '44440': 2.8,
+      '22222': null,
+      '22220': null,
       '11111': 2,
-      '11110': 1.5,
+      '40000': null,
     },
-    '1740-1769': {
-      '44444': 5,
-      '44440': 3.5,
-      '22222': 3,
-      '22220': 2.4,
-      '11111': 2.5,
-      '11110': 2,
+    '1713-1732': {
+      '44444': 3.9,
+      '44440': 3.4,
+      '22222': null,
+      '22220': null,
+      '11111': 2.15,
+      '40000': null,
     },
-    '1770-1780': {
-      '44444': 6,
-      '44440': 4.4,
-      '22222': 3.5,
-      '22220': 2.4,
-      '11111': 2.5,
-      '11110': 2,
+    '1733-1755': {
+      '44444': 4.1,
+      '44440': 3.6,
+      '22222': null,
+      '22220': null,
+      '11111': 2.3,
+      '40000': null,
     },
   };
   let range: string | null = null;
-  if (k >= 1 && k <= 1685) range = '1-1685';
-  else if (k >= 1686 && k <= 1739) range = '1686-1739';
-  else if (k >= 1740 && k <= 1769) range = '1740-1769';
-  else if (k >= 1770 && k <= 1780) range = '1770-1780';
+  if (k >= 1 && k <= 1665) range = '1-1665';
+  else if (k >= 1666 && k <= 1712) range = '1666-1712';
+  else if (k >= 1713 && k <= 1732) range = '1713-1732';
+  else if (k >= 1733 && k <= 1755) range = '1733-1755';
   if (!range) return null;
-  return priceTable[range][code] || null;
+  return priceTable[range][code] ?? null;
 }
 
 export default function InvoicePage() {
