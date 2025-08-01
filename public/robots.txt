@@ -1,2 +1,15 @@
+# *
 User-agent: *
-Allow: / 
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /cart/
+Disallow: /account/
+Disallow: /checkout
+Disallow: /invoice/
+
+# Host
+Host: https://konohabazar.store
+
+# Sitemaps
+Sitemap: https://konohabazar.store/sitemap.xml

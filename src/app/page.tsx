@@ -2,17 +2,54 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
+import Script from 'next/script';
 
 const categories = [
   { name: 'Gems', href: '/products/gems', icon: '/gems.png' },
   { name: 'Resources', href: '/products/resources', icon: '/rss.png' },
 ];
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "name": "Konoha Bazar",
+  "description": "The ultimate online shop for Lords Mobile Gems, Resources, and Bots. Fast, secure, and trusted by gamers.",
+  "url": "https://konohabazar.store",
+  "logo": "https://konohabazar.store/logo.png",
+  "image": "https://konohabazar.store/logo.png",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Lords Mobile Items",
+    "itemListElement": [
+      {
+        "@type": "OfferCatalog",
+        "name": "Lords Mobile Gems",
+        "description": "Premium gems for Lords Mobile game"
+      },
+      {
+        "@type": "OfferCatalog", 
+        "name": "Lords Mobile Resources",
+        "description": "Game resources including food, stone, wood, ore, and gold"
+      }
+    ]
+  },
+  "sameAs": [
+    "https://www.facebook.com/konohabazar",
+    "https://www.instagram.com/konohabazar"
+  ]
+};
+
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center animate-fade-in overflow-hidden">
+    <>
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="relative min-h-screen flex flex-col items-center justify-center animate-fade-in overflow-hidden">
       {/* Background gradient and glow */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#10111a] via-[#181c24] to-[#0a0a0a]" />
       <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-gradient-radial from-blue-700/40 via-purple-600/30 to-transparent rounded-full blur-3xl opacity-70 -z-10" />
@@ -59,5 +96,6 @@ export default function Home() {
         </div>
       )}
     </div>
+    </>
   );
 }
